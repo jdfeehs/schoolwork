@@ -21,9 +21,7 @@ DecodeAES = lambda c, e: c.decrypt(base64.b64decode(e)).rstrip(PADDING)
 # generate a random secret key
 #secret = os.urandom(BLOCK_SIZE)
 secret = "000000000000000000000000000000FF".decode("hex")
-print len(secret)
 iv = "9876543210FEDCBA9876543210FEDCBA".decode("hex")
-print len(iv), "     :",iv.encode("hex")
 
 #iv = 16 * '\x00'
 #iv = os.urandom(16)
