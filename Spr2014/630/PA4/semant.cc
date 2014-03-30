@@ -247,6 +247,10 @@ void program_class::semant()
     ClassTable *classtable = new ClassTable(classes);
 
     /* some semantic analysis code may go here */
+    /******************************************/
+    /*             Manal :)                   */
+    /*      Let the tree building begin       */
+    /******************************************/
 
     if (classtable->errors()) {
 	cerr << "Compilation halted due to static semantic errors." << endl;
