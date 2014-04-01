@@ -5,7 +5,9 @@
 #include <stdarg.h>
 #include "semant.h"
 #include "utilities.h"
-
+#include <map>
+#include <string>
+#include <set>
 
 extern int semant_debug;
 extern char *curr_filename;
@@ -242,7 +244,7 @@ ostream& ClassTable::semant_error()
 void program_class::semant()
 {
     initialize_constants();
-
+    build_inheritance_graph(classes)
     /* ClassTable constructor may do some semantic analysis */
     ClassTable *classtable = new ClassTable(classes);
 
@@ -255,6 +257,19 @@ void program_class::semant()
     if (classtable->errors()) {
 	cerr << "Compilation halted due to static semantic errors." << endl;
 	exit(1);
+    }
+}
+
+void build_inheritance_graph(Classes classes)
+{
+    //Figure out how to get parent-child pairs
+    for(int i = classes->first(); classes->more(i); i = classes->next(i))
+    {
+        child = classes->nth(i)->name;
+        parent = classes->nth(i)->name;
+	printf(child);
+	printf(parent);
+	printf("----------");
     }
 }
 
