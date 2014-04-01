@@ -8,7 +8,7 @@
 #include <map>
 #include <string>
 #include <set>
-
+#include <iostream>
 extern int semant_debug;
 extern char *curr_filename;
 
@@ -244,7 +244,7 @@ ostream& ClassTable::semant_error()
 void program_class::semant()
 {
     initialize_constants();
-    build_inheritance_graph(classes)
+    build_inheritance_graph(classes);
     /* ClassTable constructor may do some semantic analysis */
     ClassTable *classtable = new ClassTable(classes);
 
@@ -263,13 +263,15 @@ void program_class::semant()
 void build_inheritance_graph(Classes classes)
 {
     //Figure out how to get parent-child pairs
+    std::string child;
+    std::string parent;
     for(int i = classes->first(); classes->more(i); i = classes->next(i))
     {
-        child = classes->nth(i)->name;
-        parent = classes->nth(i)->name;
-	printf(child);
-	printf(parent);
-	printf("----------");
+        child = classes->nth(i)->get_name();
+        parent = classes->nth(i)->get_parent();
+	cout << child << endl;
+	cout << parent << endl;
+	cout << "----------" << endl;
     }
 }
 
