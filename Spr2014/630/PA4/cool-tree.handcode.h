@@ -61,7 +61,8 @@ virtual void dump_with_types(ostream&,int) = 0;
 
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
-void dump_with_types(ostream&,int);                    
+void dump_with_types(ostream&,int);   
+//Two things here: this is a macro, so you need a \ at the end of each line. Also, consider not saying class__class and just saying Symbol get_parent().                
 Symbol class__class::get_parent() { return parent; }
 Symbol class__class::get_name() { return name; }
 
