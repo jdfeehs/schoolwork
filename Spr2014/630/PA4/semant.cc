@@ -241,6 +241,55 @@ ostream& ClassTable::semant_error()
      errors. Part 2) can be done in a second stage, when you want
      to build mycoolc.
  */
+
+void build_inheritance_graph(Classes classes)
+{
+    //Figure out how to get parent-child pairs
+    Symbol child;
+    Symbol parent;
+    int child_count = 0;
+    std::map<Symbol,Symbol> map;
+    std::set<Symbol> children;
+    for(int i = classes->first(); classes->more(i); i = classes->next(i))
+    {
+        child = classes->nth(i)->get_name();
+        child_count ++;
+        parent = classes->nth(i)->get_parent();
+	//For now, print out the child/parent pairs
+	//This is just so I can debug it
+	cout << child << endl;
+	cout << parent << endl;
+	cout << "----------" << endl;
+        map.insert(std::pair<Symbol,Symbol>(child,parent));
+        if(children.count(child) == 0)
+	{
+	    children.insert(child);
+	}
+	else //it's a cycle!
+	{
+	    //i'm not sure how we're reporting errors yet.
+	    //for now, I'll do what's below
+	    cout << "CYCLE!!!!!!!!!!!!" << endl;
+	    //it should be closer to this: ClassTable::semant_error();
+	}
+    }
+    int counter = 0;
+    for(std::map<Symbol,Symbol>::iterator it = map.begin(); it!=map.end(); ++it)
+    {
+	counter = 0;
+	while(parent != Object && counter <= child_count)
+	{
+	    child = parent;
+	    parent = map[child];
+	    counter ++;
+	}
+	if(counter >= child_count)
+	{
+	  cout << "CYCLE!!!!1!!11!!!!" << endl;
+	}
+    }
+}
+
 void program_class::semant()
 {
     initialize_constants();
@@ -257,21 +306,6 @@ void program_class::semant()
     if (classtable->errors()) {
 	cerr << "Compilation halted due to static semantic errors." << endl;
 	exit(1);
-    }
-}
-
-void build_inheritance_graph(Classes classes)
-{
-    //Figure out how to get parent-child pairs
-    std::string child;
-    std::string parent;
-    for(int i = classes->first(); classes->more(i); i = classes->next(i))
-    {
-        child = classes->nth(i)->get_name();
-        parent = classes->nth(i)->get_parent();
-	cout << child << endl;
-	cout << parent << endl;
-	cout << "----------" << endl;
     }
 }
 

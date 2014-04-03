@@ -20,3 +20,7 @@ Class Main {
 	 }
 	};
 };
+Class B inherits C {};
+Class A inherits Cycle_B {};
+Class Cycle_A inherits A{};
+Class Cycle_B inherits Cycle_A{};
