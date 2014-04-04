@@ -241,15 +241,59 @@ ostream& ClassTable::semant_error()
      errors. Part 2) can be done in a second stage, when you want
      to build mycoolc.
  */
+/*
+ * The following declarations are the global map and set.
+ * The map stores mappings from child -> parent
+ * In order to get the parent class of a child, use:
+ * map[child Symbol]    --> this will return the Symbol of its parent
+ */
+std::map<Symbol,Symbol> map;
+std::set<Symbol> children;
 
+/*
+ * The method tests to see if class_a is a subclass of class_B
+ * returns true if class_a <= class_b, false otherwise
+ */
+bool test_subclass(Symbol class_a, Symbol class_b)
+{
+  int counter;
+  int child_count = children.size();
+  Symbol child = class_a;
+  Symbol parent = map[class_a];
+  counter = 0;
+  while(parent != Object && counter <= child_count)
+  {
+    child = parent;
+    parent = map[child];
+    counter ++;
+  }
+
+  if(counter >= child_count -2 && class_b != Object)
+  {
+    return false;
+  }
+  else
+  {
+    return true;	
+  }
+
+
+}
+/*
+ * This method actually builds the inheritance graph
+ * It uses a similar algorithm to the inheritance checker
+ * in order to check for a cycle not caused by one class
+ * being a child twice
+ * This function does not return anything, as it builds the global map
+ * As a reminder, the map is map[child] = parent, where child and parent
+ * are both of type Symbol.
+ */
 void build_inheritance_graph(Classes classes)
 {
-    //Figure out how to get parent-child pairs
     Symbol child;
     Symbol parent;
     int child_count = 0;
-    std::map<Symbol,Symbol> map;
-    std::set<Symbol> children;
+    // This is a way to iterate through all of the classes in a Classes object
     for(int i = classes->first(); classes->more(i); i = classes->next(i))
     {
         child = classes->nth(i)->get_name();
@@ -257,9 +301,9 @@ void build_inheritance_graph(Classes classes)
         parent = classes->nth(i)->get_parent();
 	//For now, print out the child/parent pairs
 	//This is just so I can debug it
-	cout << child << endl;
-	cout << parent << endl;
-	cout << "----------" << endl;
+	//cout << child << endl;
+	//cout << parent << endl;
+	//cout << "----------" << endl;
         map.insert(std::pair<Symbol,Symbol>(child,parent));
         if(children.count(child) == 0)
 	{
@@ -273,6 +317,7 @@ void build_inheritance_graph(Classes classes)
 	    //it should be closer to this: ClassTable::semant_error();
 	}
     }
+    //This is my second way to check for cycles
     int counter = 0;
     for(std::map<Symbol,Symbol>::iterator it = map.begin(); it!=map.end(); ++it)
     {
@@ -295,6 +340,11 @@ void program_class::semant()
     initialize_constants();
     build_inheritance_graph(classes);
     /* ClassTable constructor may do some semantic analysis */
+    bool test = test_subclass(classes->nth(0)->get_name(),Object);
+    cout << "My two classes were: " << classes->nth(0)->get_name() << " and " << classes->nth(1)->get_name() << endl;
+    cout << "I sure hope that this is: " << test << endl;
+    test = test_subclass(classes->nth(0)->get_name(),classes->nth(1)->get_name());
+    cout << "But this should be :" << test << endl;
     ClassTable *classtable = new ClassTable(classes);
 
     /* some semantic analysis code may go here */
