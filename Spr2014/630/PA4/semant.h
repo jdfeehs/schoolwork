@@ -11,6 +11,9 @@
 #define TRUE 1
 #define FALSE 0
 
+//We use these codes when reporting errors.
+enum code{REDEFINITION,CYCLE,DUPLICATE,INHERIT}
+
 class ClassTable;
 typedef ClassTable *ClassTableP;
 

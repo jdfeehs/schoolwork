@@ -89,8 +89,19 @@ static void initialize_constants(void)
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 
-    /* Fill this in */
+	class_table=new SymbolTable<Symbol, class__class>();
+	class_table->enterscope();
+	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
+	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
+	{
+	
 
+	}
+
+	//class_table->addid()
+
+	install_basic_classes();
+	//Check for inheritence using your thing here Josh.
 }
 
 void ClassTable::install_basic_classes() {
@@ -127,6 +138,9 @@ void ClassTable::install_basic_classes() {
 			       single_Features(method(copy, nil_Formals(), SELF_TYPE, no_expr()))),
 	       filename);
 
+	//We need to account for this in our map and table
+	//class_table->addid()
+
     // 
     // The IO class inherits from Object. Its methods are
     //        out_string(Str) : SELF_TYPE       writes a string to the output
@@ -148,6 +162,9 @@ void ClassTable::install_basic_classes() {
 			       single_Features(method(in_int, nil_Formals(), Int, no_expr()))),
 	       filename);  
 
+	//We need to account for this in our map and table
+	//class_table->addid()
+
     //
     // The Int class has no methods and only a single attribute, the
     // "val" for the integer. 
@@ -158,11 +175,17 @@ void ClassTable::install_basic_classes() {
 	       single_Features(attr(val, prim_slot, no_expr())),
 	       filename);
 
+	//We need to account for this in our map and table
+	//class_table->addid()
+
     //
     // Bool also has only the "val" slot.
     //
     Class_ Bool_class =
 	class_(Bool, Object, single_Features(attr(val, prim_slot, no_expr())),filename);
+
+	//We need to account for this in our map and table
+	//class_table->addid()
 
     //
     // The class Str has a number of slots and operations:
@@ -192,6 +215,28 @@ void ClassTable::install_basic_classes() {
 						      Str, 
 						      no_expr()))),
 	       filename);
+	//We need to account for this in our map and table
+	//class_table->addid()
+}
+
+//Collect declarations for method and objects: we create symbol tables and then
+//traverse the tree using traverse.
+void ClassTable::collect_declarations()
+{
+	method_table=new SymbolTable<Symbol, method_class>();
+	object_table=new SymbolTable<Symbol, Symbol>();
+	traverse(Object);
+}
+
+//This will travel the tree and make sure everything is correct & well formed magically! Ah, dreams. :)
+void ClassTable::traverse(Symbol symbol)
+{
+	method_table->enterscope();
+	object_table->enterscope();
+
+
+	object_table->exitscope();
+	method_table->exitscope();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -209,8 +254,26 @@ void ClassTable::install_basic_classes() {
 //
 ///////////////////////////////////////////////////////////////////
 
-ostream& ClassTable::semant_error(Class_ c)
-{                                                             
+//Added a code flag so that we can address specific issues, see semant.h
+ostream& ClassTable::semant_error(Class_ c, code)
+{   
+    switch(code)
+	{
+		case REDEFINITION:
+			//Someone use sprintf to make these errors nicer
+			cout << "Redefinition of basic class." << endl;
+			break;
+		case CYCLE:
+			cout << "There is an ineritance cycle." << endl;
+			break;
+		case DUPLICATE:
+			cout << "There is a duplicate class." << endl;
+			break;
+		case INHERIT:
+			//With sprintf, we could say which classes! Do later. 
+			cout << "A class cannot inherit another class." << endl;
+			break;
+	}                                                          
     return semant_error(c->get_filename(),c);
 }    
 
@@ -313,8 +376,9 @@ void build_inheritance_graph(Classes classes)
 	{
 	    //i'm not sure how we're reporting errors yet.
 	    //for now, I'll do what's below
-	    cout << "CYCLE!!!!!!!!!!!!" << endl;
-	    //it should be closer to this: ClassTable::semant_error();
+	    //cout << "CYCLE!!!!!!!!!!!!" << endl;
+	    //Close, try this ;)
+	    semant_error(child,CYCLE);
 	}
     }
     //This is my second way to check for cycles
@@ -330,7 +394,8 @@ void build_inheritance_graph(Classes classes)
 	}
 	if(counter >= child_count)
 	{
-	  cout << "CYCLE!!!!1!!11!!!!" << endl;
+	  //cout << "CYCLE!!!!1!!11!!!!" << endl;
+	  semant_error(child,CYCLE);
 	}
     }
 }
@@ -357,6 +422,10 @@ void program_class::semant()
 	cerr << "Compilation halted due to static semantic errors." << endl;
 	exit(1);
     }
+
+    //We begin by collecting the declarations, see it above. It works, but it calls a method that does
+    //not exist yet. In short, DON'T uncomment the line below until we're ready to begin the chaos.
+    //classtable->collect_declaration();
 }
 
 
