@@ -94,14 +94,31 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
 	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
 	{
+		class__class *INSTANTIATEDclass=(class__class *)(classes->nth(i));
+		//insert into class map as well
 	
+		//This should test for any duplicates
+		if (class_table->probe(INSTANTIATEDclass->getname())!=NULL)
+			semant_error(INSTANTIATEDclass, DUPLICATE);
+		
+		class_table->addid(INSTANTIATEDclass->getname(), INSTANTIATEDclass);
+	
+		//Now we look for any illegal redeclarations
+		if(INSTANTIATEDclass->getname()==No_class)
+			semant_error(INSTANTIATEDclass, REDEFINITION);
+		else if(aclass->getname()==Object)
+			semant_error(INSTANTIATEDclass, REDEFINITION);
+		else if(aclass->getname()==IO)
+			semant_error(INSTANTIATEDclass, REDEFINITION);
+		else if(aclass->getname()==Int)
+			semant_error(INSTANTIATEDclass, REDEFINITION);
+		else if(aclass->getname()==Str)
+			semant_error(INSTANTIATEDclass, REDEFINITION);
 
 	}
 
-	//class_table->addid()
-
 	install_basic_classes();
-	//Check for inheritence using your thing here Josh.
+	//Check for inheritence and undeclared classes using your thing here Josh.
 }
 
 void ClassTable::install_basic_classes() {
@@ -139,7 +156,8 @@ void ClassTable::install_basic_classes() {
 	       filename);
 
 	//We need to account for this in our map and table
-	//class_table->addid()
+	//Remember that the table is Object to object
+	class_table->addid(Object, (class__class *)Object_class);
 
     // 
     // The IO class inherits from Object. Its methods are
@@ -163,7 +181,7 @@ void ClassTable::install_basic_classes() {
 	       filename);  
 
 	//We need to account for this in our map and table
-	//class_table->addid()
+	class_table->addid(IO, (class__class *)IO_class);
 
     //
     // The Int class has no methods and only a single attribute, the
@@ -176,7 +194,7 @@ void ClassTable::install_basic_classes() {
 	       filename);
 
 	//We need to account for this in our map and table
-	//class_table->addid()
+	class_table->addid(Int, (class__class *)Int_class);
 
     //
     // Bool also has only the "val" slot.
@@ -185,7 +203,7 @@ void ClassTable::install_basic_classes() {
 	class_(Bool, Object, single_Features(attr(val, prim_slot, no_expr())),filename);
 
 	//We need to account for this in our map and table
-	//class_table->addid()
+	class_table->addid(Bool, (class__class *)Bool_class);
 
     //
     // The class Str has a number of slots and operations:
@@ -216,7 +234,7 @@ void ClassTable::install_basic_classes() {
 						      no_expr()))),
 	       filename);
 	//We need to account for this in our map and table
-	//class_table->addid()
+	class_table->addid(Str, (class__class *)Str_class);
 }
 
 //Collect declarations for method and objects: we create symbol tables and then
@@ -233,7 +251,12 @@ void ClassTable::traverse(Symbol symbol)
 {
 	method_table->enterscope();
 	object_table->enterscope();
-
+	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
+	
+	INSTANTIATEDclass->scan(object_table,methoud_table,class_table);
+	
+	//Now we can use a multimap to recurse through the tree. This
+	//is very similar to travelling for inheritance.
 
 	object_table->exitscope();
 	method_table->exitscope();
@@ -272,6 +295,9 @@ ostream& ClassTable::semant_error(Class_ c, code)
 		case INHERIT:
 			//With sprintf, we could say which classes! Do later. 
 			cout << "A class cannot inherit another class." << endl;
+			break;
+		case UNDECLARED:
+			cout << "Undeclared class or inheriting from undeclared class." << endl;
 			break;
 	}                                                          
     return semant_error(c->get_filename(),c);
