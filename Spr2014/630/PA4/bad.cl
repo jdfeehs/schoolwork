@@ -23,4 +23,5 @@ Class Main {
 };
 Class B inherits C {};
 Class Cycle_A inherits A{};
+Class B inherits C{};
 Class Cycle_B inherits Cycle_A{};

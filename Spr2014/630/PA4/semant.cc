@@ -50,6 +50,17 @@ static Symbol
     substr,
     type_name,
     val;
+
+/*
+ * The following declarations are the global map and set.
+ * The map stores mappings from child -> parent
+ * In order to get the parent class of a child, use:
+ * map[child Symbol]    --> this will return the Symbol of its parent
+ */
+std::map<Symbol,Symbol> map;
+std::set<Symbol> children;
+
+
 //
 // Initializing the predefined symbols.
 //
@@ -89,6 +100,7 @@ static void initialize_constants(void)
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 
+        build_inheritance_graph(classes);
 	class_table=new SymbolTable<Symbol, class__class>();
 	class_table->enterscope();
 	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
@@ -119,6 +131,78 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
 	install_basic_classes();
 	//Check for inheritence and undeclared classes using your thing here Josh.
+}
+
+
+/*
+ * This method actually builds the inheritance graph
+ * It uses a similar algorithm to the inheritance checker
+ * in order to check for a cycle not caused by one class
+ * being a child twice
+ * This function does not return anything, as it builds the global map
+ * As a reminder, the map is map[child] = parent, where child and parent
+ * are both of type Symbol.
+ */
+void ClassTable::build_inheritance_graph(Classes classes)
+{
+    Symbol child;
+    Symbol parent;
+    int child_count = 0;
+    // This is a way to iterate through all of the classes in a Classes object
+    for(int i = classes->first(); classes->more(i); i = classes->next(i))
+    {
+        child = classes->nth(i)->get_name();
+        child_count ++;
+        parent = classes->nth(i)->get_parent();
+	//For now, print out the child/parent pairs
+	//This is just so I can debug it
+	//cout << child << endl;
+	//cout << parent << endl;
+	//cout << "----------" << endl;
+        map.insert(std::pair<Symbol,Symbol>(child,parent));
+        if(children.count(child) == 0)
+	{
+	    children.insert(child);
+	}
+	else //it's a cycle!
+	{
+	    //i'm not sure how we're reporting errors yet.
+	    //for now, I'll do what's below
+	    //cout << "CYCLE!!!!!!!!!!!!" << endl;
+	    //Close, try this ;)
+	    this->semant_error(child,CYCLE);
+	}
+    }
+    //This is my second way to check for cycles
+    int counter = 0;
+    for(std::map<Symbol,Symbol>::iterator it = map.begin(); it!=map.end(); ++it)
+    {
+	counter = 0;
+	while(parent != Object && counter <= child_count)
+	{
+	    child = parent;
+	    parent = map[child];
+	    counter ++;
+	}
+	if(counter >= child_count)
+	{
+	  //cout << "CYCLE!!!!1!!11!!!!" << endl;
+	  this->semant_error(child,CYCLE);
+	}
+    }
+    Symbol curChild;
+    for(std::set<Symbol>::iterator it = children.begin(); it!= children.end(); ++it)
+    {
+        curChild = *it;
+        if(children.count(map[curChild]) == 0 && map[curChild] != Object)
+	{
+          Symbol badParent = map[curChild];
+	  //This means the parent wasn't defined
+	  this->semant_error(badParent,UNDECLARED);
+  	  break;
+	}
+
+    }
 }
 
 void ClassTable::install_basic_classes() {
@@ -278,9 +362,9 @@ void ClassTable::traverse(Symbol symbol)
 ///////////////////////////////////////////////////////////////////
 
 //Added a code flag so that we can address specific issues, see semant.h
-ostream& ClassTable::semant_error(Class_ c, code)
+ostream& ClassTable::semant_error(Class_ c, code error_type)
 {   
-    switch(code)
+    switch(error_type)
 	{
 		case REDEFINITION:
 			//Someone use sprintf to make these errors nicer
@@ -302,9 +386,9 @@ ostream& ClassTable::semant_error(Class_ c, code)
 	}                                                          
     return semant_error(c->get_filename(),c);
 }    
-ostream& ClassTable::semant_error(Symbol s, code)
+ostream& ClassTable::semant_error(Symbol s,code error_type)
 {   
-    switch(code)
+    switch(error_type)
 	{
 		case REDEFINITION:
 			//Someone use sprintf to make these errors nicer
@@ -354,14 +438,6 @@ ostream& ClassTable::semant_error()
      errors. Part 2) can be done in a second stage, when you want
      to build mycoolc.
  */
-/*
- * The following declarations are the global map and set.
- * The map stores mappings from child -> parent
- * In order to get the parent class of a child, use:
- * map[child Symbol]    --> this will return the Symbol of its parent
- */
-std::map<Symbol,Symbol> map;
-std::set<Symbol> children;
 
 /*
  * The method tests to see if class_a is a subclass of class_B
@@ -428,7 +504,7 @@ void build_inheritance_graph(Classes classes)
 	    //for now, I'll do what's below
 	    //cout << "CYCLE!!!!!!!!!!!!" << endl;
 	    //Close, try this ;)
-	    ClassTable::semant_error(child,CYCLE);
+	    //ClassTable::semant_error(child,CYCLE);
 	}
     }
     //This is my second way to check for cycles
@@ -445,7 +521,7 @@ void build_inheritance_graph(Classes classes)
 	if(counter >= child_count)
 	{
 	  //cout << "CYCLE!!!!1!!11!!!!" << endl;
-	  ClassTable::semant_error(child,CYCLE);
+	  //ClassTable::semant_error(child,CYCLE);
 	}
     }
     Symbol curChild;
@@ -456,7 +532,7 @@ void build_inheritance_graph(Classes classes)
 	{
           Symbol badParent = map[curChild];
 	  //This means the parent wasn't defined
-	  ClassTable::semant_error(badParent,UNDECLARED);
+	  //ClassTable::semant_error(badParent,UNDECLARED);
   	  break;
 	}
 

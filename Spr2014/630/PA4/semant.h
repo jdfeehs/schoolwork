@@ -12,7 +12,7 @@
 #define FALSE 0
 
 //We use these codes when reporting errors.
-enum code{REDEFINITION,CYCLE,DUPLICATE,INHERIT,UNDECLARED}
+enum code{REDEFINITION,CYCLE,DUPLICATE,INHERIT,UNDECLARED};
 
 class ClassTable;
 typedef ClassTable *ClassTableP;
@@ -37,9 +37,11 @@ public:
   int errors() { return semant_errors; }
   ostream& semant_error();
   ostream& semant_error(Class_ c);
-  ostream& semant_error(Class_ c,code);
-  ostream& semant_error(Symbol s,code);
+  ostream& semant_error(Class_ c,code error_type);
+  ostream& semant_error(Symbol s,code error_type);
   ostream& semant_error(Symbol filename, tree_node *t);
+  void build_inheritance_graph(Classes classes);
+  void traverse(Symbol symbol);
   void collect_declarations();
 };
 
