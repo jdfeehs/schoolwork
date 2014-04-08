@@ -98,21 +98,21 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 		//insert into class map as well
 	
 		//This should test for any duplicates
-		if (class_table->probe(INSTANTIATEDclass->getname())!=NULL)
+		if (class_table->probe(INSTANTIATEDclass->get_name())!=NULL)
 			semant_error(INSTANTIATEDclass, DUPLICATE);
 		
-		class_table->addid(INSTANTIATEDclass->getname(), INSTANTIATEDclass);
+		class_table->addid(INSTANTIATEDclass->get_name(), INSTANTIATEDclass);
 	
 		//Now we look for any illegal redeclarations
-		if(INSTANTIATEDclass->getname()==No_class)
+		if(INSTANTIATEDclass->get_name()==No_class)
 			semant_error(INSTANTIATEDclass, REDEFINITION);
-		else if(aclass->getname()==Object)
+		else if(INSTANTIATEDclass->get_name()==Object)
 			semant_error(INSTANTIATEDclass, REDEFINITION);
-		else if(aclass->getname()==IO)
+		else if(INSTANTIATEDclass->get_name()==IO)
 			semant_error(INSTANTIATEDclass, REDEFINITION);
-		else if(aclass->getname()==Int)
+		else if(INSTANTIATEDclass->get_name()==Int)
 			semant_error(INSTANTIATEDclass, REDEFINITION);
-		else if(aclass->getname()==Str)
+		else if(INSTANTIATEDclass->get_name()==Str)
 			semant_error(INSTANTIATEDclass, REDEFINITION);
 
 	}
@@ -253,7 +253,7 @@ void ClassTable::traverse(Symbol symbol)
 	object_table->enterscope();
 	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
-	INSTANTIATEDclass->scan(object_table,methoud_table,class_table);
+	//INSTANTIATEDclass->scan(object_table,methoud_table,class_table);
 	
 	//Now we can use a multimap to recurse through the tree. This
 	//is very similar to travelling for inheritance.
@@ -273,7 +273,7 @@ void ClassTable::traverse(Symbol symbol)
 //       print line number and filename for `c'
 //
 //    ostream& ClassTable::semant_error(Symbol filename, tree_node *t)  
-//       print a line number and filename
+//       print a line nuber and filename
 //
 ///////////////////////////////////////////////////////////////////
 
@@ -301,6 +301,30 @@ ostream& ClassTable::semant_error(Class_ c, code)
 			break;
 	}                                                          
     return semant_error(c->get_filename(),c);
+}    
+ostream& ClassTable::semant_error(Symbol s, code)
+{   
+    switch(code)
+	{
+		case REDEFINITION:
+			//Someone use sprintf to make these errors nicer
+			cout << "Redefinition of basic class." << endl;
+			break;
+		case CYCLE:
+			cout << "There is an ineritance cycle." << endl;
+			break;
+		case DUPLICATE:
+			cout << "There is a duplicate class." << endl;
+			break;
+		case INHERIT:
+			//With sprintf, we could say which classes! Do later. 
+			cout << "A class cannot inherit another class." << endl;
+			break;
+		case UNDECLARED:
+			cout << "Undeclared class or inheriting from undeclared class." << endl;
+			break;
+	}                                                          
+    return semant_error(); //not sure how to get the class to send the line number
 }    
 
 ostream& ClassTable::semant_error(Symbol filename, tree_node *t)
@@ -404,7 +428,7 @@ void build_inheritance_graph(Classes classes)
 	    //for now, I'll do what's below
 	    //cout << "CYCLE!!!!!!!!!!!!" << endl;
 	    //Close, try this ;)
-	    semant_error(child,CYCLE);
+	    ClassTable::semant_error(child,CYCLE);
 	}
     }
     //This is my second way to check for cycles
@@ -421,8 +445,21 @@ void build_inheritance_graph(Classes classes)
 	if(counter >= child_count)
 	{
 	  //cout << "CYCLE!!!!1!!11!!!!" << endl;
-	  semant_error(child,CYCLE);
+	  ClassTable::semant_error(child,CYCLE);
 	}
+    }
+    Symbol curChild;
+    for(std::set<Symbol>::iterator it = children.begin(); it!= children.end(); ++it)
+    {
+        curChild = *it;
+        if(children.count(map[curChild]) == 0 && map[curChild] != Object)
+	{
+          Symbol badParent = map[curChild];
+	  //This means the parent wasn't defined
+	  ClassTable::semant_error(badParent,UNDECLARED);
+  	  break;
+	}
+
     }
 }
 

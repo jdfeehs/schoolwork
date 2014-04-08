@@ -37,6 +37,8 @@ public:
   int errors() { return semant_errors; }
   ostream& semant_error();
   ostream& semant_error(Class_ c);
+  ostream& semant_error(Class_ c,code);
+  ostream& semant_error(Symbol s,code);
   ostream& semant_error(Symbol filename, tree_node *t);
   void collect_declarations();
 };
