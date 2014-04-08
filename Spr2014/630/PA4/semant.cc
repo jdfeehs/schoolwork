@@ -127,8 +127,6 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 
 }
 
-
-
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 
         build_inheritance_graph(classes);
