@@ -7,7 +7,8 @@
 #include "stringtab.h"
 #include "symtab.h"
 #include "list.h"
-
+#include <map>
+#include <set>
 #define TRUE 1
 #define FALSE 0
 
@@ -26,6 +27,7 @@ class ClassTable {
 private:
   int semant_errors;
   void install_basic_classes();
+ 
   ostream& error_stream;
   //Table for each class, such that the comments hold below.
   SymbolTable<Symbol,class__class> *class_table;  //class name -> class address
@@ -42,6 +44,7 @@ public:
   ostream& semant_error(Symbol filename, tree_node *t);
   void build_inheritance_graph(Classes classes);
   void traverse(Symbol symbol);
+  Symbol least_common_parent(Symbol a, Symbol b);
   void collect_declarations();
 };
 
