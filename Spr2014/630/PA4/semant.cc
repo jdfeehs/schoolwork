@@ -239,8 +239,6 @@ void ClassTable::install_basic_classes() {
 			       single_Features(method(copy, nil_Formals(), SELF_TYPE, no_expr()))),
 	       filename);
 
-	//We need to account for this in our map and table
-	//Remember that the table is Object to object
 	class_table->addid(Object, (class__class *)Object_class);
 
     // 
@@ -264,7 +262,6 @@ void ClassTable::install_basic_classes() {
 			       single_Features(method(in_int, nil_Formals(), Int, no_expr()))),
 	       filename);  
 
-	//We need to account for this in our map and table
 	class_table->addid(IO, (class__class *)IO_class);
 
     //
@@ -277,7 +274,6 @@ void ClassTable::install_basic_classes() {
 	       single_Features(attr(val, prim_slot, no_expr())),
 	       filename);
 
-	//We need to account for this in our map and table
 	class_table->addid(Int, (class__class *)Int_class);
 
     //
@@ -286,7 +282,6 @@ void ClassTable::install_basic_classes() {
     Class_ Bool_class =
 	class_(Bool, Object, single_Features(attr(val, prim_slot, no_expr())),filename);
 
-	//We need to account for this in our map and table
 	class_table->addid(Bool, (class__class *)Bool_class);
 
     //
@@ -317,7 +312,7 @@ void ClassTable::install_basic_classes() {
 						      Str, 
 						      no_expr()))),
 	       filename);
-	//We need to account for this in our map and table
+
 	class_table->addid(Str, (class__class *)Str_class);
 }
 
@@ -341,7 +336,10 @@ void ClassTable::traverse(Symbol symbol)
 	
 	//Now we can use a multimap to recurse through the tree. This
 	//is very similar to travelling for inheritance.
-
+	//std::multimap<Symbol, Symbol>::iterator it = range.first; 
+      // it != range.second; ++it)
+	
+	
 	object_table->exitscope();
 	method_table->exitscope();
 }
