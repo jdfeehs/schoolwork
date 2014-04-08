@@ -103,25 +103,27 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 {
   int counter;
   int child_count = children.size();
+  //take care of easy cases
+  if(class_b == Object){
+    return true;
+  }
+  else if (class_a == Object){
+    return false;
+  }
   Symbol child = class_a;
   Symbol parent = map[class_a];
   counter = 0;
   while(parent != Object && counter <= child_count)
   {
+    if(parent == class_b){
+      return true;
+    }
     child = parent;
     parent = map[child];
     counter ++;
-  }
-
-  if(counter >= child_count -2 && class_b != Object)
-  {
-    return false;
-  }
-  else
-  {
-    return true;	
-  }
-
+     
+ }
+ return false;
 
 }
 
@@ -130,6 +132,13 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 
         build_inheritance_graph(classes);
+        cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
+        Symbol first = classes->nth(3)->get_name();
+        Symbol second = classes->nth(4)->get_name();
+        cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
+        //child = classes->nth(i)->get_name();
+        //parent = classes->nth(i)->get_parent();
+          
 	class_table=new SymbolTable<Symbol, class__class>();
 	class_table->enterscope();
 	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
@@ -166,21 +175,25 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
  * This method takes in two Symbols (class names)
  * It returns their least common parent (as a Symbol)
  */
-Symbol least_common_parent(Symbol a, Symbol b)
+Symbol ClassTable::least_common_parent(Symbol a, Symbol b)
 {
   Symbol temp_A = a;
   Symbol temp_B = b;
   //Take care of the easy cases
   while(temp_A != Object){
     if(test_subclass(temp_A,temp_B)){
+        cout << "Result 1" << endl;
 	return temp_B;}
     if(test_subclass(temp_B,temp_A)){
+        cout << "Result 2" << endl;
 	return temp_A;}
     while(temp_B != Object){
       temp_B = map[temp_B];
       if(test_subclass(temp_A,temp_B)){
+        cout << "Result 3" << endl;
 	return temp_B;}
       if(test_subclass(temp_B,temp_A)){
+        cout << "Result 4" << endl;
 	return temp_A;}
     }
     temp_A = map[temp_A];
