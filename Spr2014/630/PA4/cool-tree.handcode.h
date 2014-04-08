@@ -46,7 +46,8 @@ typedef Cases_class *Cases;
 
 #define Program_EXTRAS                          \
 virtual void semant() = 0;			\
-virtual void dump_with_types(ostream&, int) = 0; 
+virtual void dump_with_types(ostream&, int) = 0;  \
+SymbolTable<Symbol, class__class> clazz;
 
 
 
@@ -56,9 +57,10 @@ void dump_with_types(ostream&, int);
 
 #define Class__EXTRAS                   \
 virtual Symbol get_filename() = 0;      \
-virtual void dump_with_types(ostream&,int) = 0;  \ 
+virtual void dump_with_types(ostream&,int) = 0; \
 virtual Symbol get_parent() = 0;  \
-virtual Symbol get_name() = 0;
+virtual Symbol get_name() = 0; \
+SymbolTable<Symbol, class__class> clazz;
 
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
@@ -70,7 +72,10 @@ Symbol get_name() { return name; }
 virtual void dump_with_types(ostream&,int) = 0; 		\
 virtual void scan(SymbolTable<Symbol, Symbol>*, 			\
                     SymbolTable<Symbol, method_class>*,		\
-                    SymbolTable<Symbol, class__class>*) = 0; 
+                    SymbolTable<Symbol, class__class>*) = 0; \
+SymbolTable<Symbol, Symbol> objs; \
+SymbolTable<Symbol, method_class> functs; \
+SymbolTable<Symbol, class__class> clazz;
 
 #define Feature_SHARED_EXTRAS                                       \
 void dump_with_types(ostream&,int);    
@@ -83,7 +88,10 @@ void dump_with_types(ostream&,int);
 virtual void dump_with_types(ostream&,int) = 0; \
  virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, method_class>*, \
-                    SymbolTable<Symbol, class__class>*) = 0;
+                    SymbolTable<Symbol, class__class>*) = 0; \
+SymbolTable<Symbol, Symbol> objs; \
+SymbolTable<Symbol, method_class> functs; \
+SymbolTable<Symbol, class__class> clazz;
 
 
 #define formal_EXTRAS                           \
@@ -107,9 +115,12 @@ void dump_type(ostream&, int);               \
 Expression_class() { type = (Symbol) NULL; } \
 virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, method_class>*, \
-                    SymbolTable<Symbol, class__class>*) = 0;
+                    SymbolTable<Symbol, class__class>*) = 0; \
+ SymbolTable<Symbol, Symbol> objs; \
+ SymbolTable<Symbol, method_class> functs; \
+ SymbolTable<Symbol, class__class> clazz;
 
 #define Expression_SHARED_EXTRAS           \
-void dump_with_types(ostream&,int); 
+void dump_with_types(ostream&,int);  
 
 #endif
