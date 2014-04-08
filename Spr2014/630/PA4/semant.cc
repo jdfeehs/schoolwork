@@ -551,6 +551,12 @@ void program_class::semant()
     //We begin by collecting the declarations, see it above. It works, but it calls a method that does
     //not exist yet. In short, DON'T uncomment the line below until we're ready to begin the chaos.
     //classtable->collect_declaration();
+	//Add type checking here. We can do something crazy like this->typecheck and attach it to each node (XD)
+	//or make a helper method or something:
+	//if(typecheckingthing and node decoration has errors)
+		//cout << "Compilation halted due to static semantic errors." << endl;
+		//exit(1)
+	//Nothing else, there's no errors and the nodes have been decorated.
 }
 
 
