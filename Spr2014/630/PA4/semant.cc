@@ -420,7 +420,7 @@ void ClassTable::traverse(Symbol symbol)
 	object_table->enterscope();
 	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
-	//INSTANTIATEDclass->scan(object_table,methoud_table,class_table);
+	//INSTANTIATEDclass->scan(object_table,method_table,class_table);
 	
 	//Now we can use a multimap to recurse through the tree. This
 	//is very similar to travelling for inheritance.

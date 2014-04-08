@@ -67,8 +67,10 @@ Symbol get_parent() { return parent; } \
 Symbol get_name() { return name; } 
 
 #define Feature_EXTRAS                                        \
-virtual void dump_with_types(ostream&,int) = 0; 
-
+virtual void dump_with_types(ostream&,int) = 0; 		\
+virtual void scan(SymbolTable<Symbol, Symbol>*, 			\
+                    SymbolTable<Symbol, method_class>*,		\
+                    SymbolTable<Symbol, class__class>*) = 0; 
 
 #define Feature_SHARED_EXTRAS                                       \
 void dump_with_types(ostream&,int);    
@@ -78,7 +80,10 @@ void dump_with_types(ostream&,int);
 
 
 #define Formal_EXTRAS                              \
-virtual void dump_with_types(ostream&,int) = 0;
+virtual void dump_with_types(ostream&,int) = 0; \
+ virtual void scan(SymbolTable<Symbol, Symbol>*, \
+                    SymbolTable<Symbol, method_class>*, \
+                    SymbolTable<Symbol, class__class>*) = 0;
 
 
 #define formal_EXTRAS                           \
@@ -99,7 +104,10 @@ Symbol get_type() { return type; }           \
 Expression set_type(Symbol s) { type = s; return this; } \
 virtual void dump_with_types(ostream&,int) = 0;  \
 void dump_type(ostream&, int);               \
-Expression_class() { type = (Symbol) NULL; }
+Expression_class() { type = (Symbol) NULL; } \
+virtual void scan(SymbolTable<Symbol, Symbol>*, \
+                    SymbolTable<Symbol, method_class>*, \
+                    SymbolTable<Symbol, class__class>*) = 0;
 
 #define Expression_SHARED_EXTRAS           \
 void dump_with_types(ostream&,int); 
