@@ -166,7 +166,6 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 	}
 
 	install_basic_classes();
-	//Check for inheritence and undeclared classes using your thing here Josh.
 }
 
 /*
