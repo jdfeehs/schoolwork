@@ -72,27 +72,24 @@ SymbolTable<Symbol, method_class> functs; \
 Symbol type_check();
 
 #define class__EXTRAS                                 \
-Symbol get_filename() { return filename; }             \
-void dump_with_types(ostream&,int);   \
-Symbol getparent() { return parent; } \
-Symbol getname() { return name; } \
+Symbol getname() { return name; }\
+  Symbol getfile() { return filename; }\
+  Symbol getparent() { return parent; }\
+  Features getfeatures() { return features; }\
 Symbol type_check();\
-void scan(SymbolTable<Symbol, Symbol>* otable, \
-            SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, class__class>* ctable) { \
-    for(int i = features->first(); features->more(i); i = features->next(i)) { \
-      Feature_class* a_feature = (Feature_class*)features->nth(i); \
-      if (a_feature->is_method()) \
-        ftable->addid(a_feature->get_name(), (method_class *)a_feature); \
+for(int i = features->first(); features->more(i); i = features->next(i)) {\
+      Feature_class* afeature = (Feature_class*)features->nth(i); \
+      if (afeature->is_method())\
+        ftable->addid(afeature->getname(), (method_class *)afeature);\
       else \
-        otable->addid(a_feature->get_name(), a_feature->get_type_addr()); \
-    } \
+        otable->addid(afeature->getname(), afeature->get_type_addr());\
+    }\
     for(int i = features->first(); features->more(i); i = features->next(i)) \
-      features->nth(i)->scan(otable, ftable, ctable); \
-    objs = *otable; \
-    functs = *ftable; \
-    clazz = *ctable; \
-  }
+      features->nth(i)->scan(otable, ftable, ctable);\
+    objs = *otable;\
+    functs = *ftable;\
+    clazz = *ctable;\
+
 
 #define Feature_EXTRAS                                        \
 virtual void dump_with_types(ostream&,int) = 0; 		\
@@ -161,7 +158,6 @@ void dump_with_types(ostream&,int);  \
  Symbol getreturn() {return return_type; }\
  Symbol* get_type_addr() { return NULL; }\
  Boolean is_method() {return true;}\
- Boolean is_method() {return true;} \
  Symbol type_check();\
  void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
@@ -181,6 +177,7 @@ void dump_with_types(ostream&,int);  \
   Symbol type_check();\
   Boolean is_method() { return false; }\
   Symbol get_name() { return name; } \
+  Symbol* get_type_addr() { return &type_decl; } \
    void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
