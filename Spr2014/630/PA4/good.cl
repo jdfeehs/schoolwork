@@ -6,8 +6,9 @@ class C {
 		self;
            }
 	};
-	a : Int; (* Declare after use in the method up at top*)
-	b : Bool;
+	a         : Int; (* Declare after use in the method up at top*)
+	b 		  : Bool;
+	use_later : Int;
 };
 class B inherits C{
 	convertnum:        Int;
@@ -35,7 +36,6 @@ class D inherits C{
 	object_example:    		Object <- new IO;
 	string_example_object:  Object <- string_example;
 	bool_example:			Bool <-true;
-
 	self_ret(): D {self};
 	init(x : Int, y : Bool) : C {
     	{
@@ -43,7 +43,10 @@ class D inherits C{
         }
 	};
 	result(input : Int): Int {
-		result <- input
+		{
+			result <- input;
+			use_later <- 25;
+		}
 	};
 	adding(num1 : Int, num2: Int) : Int{
 			adding_result <- num1 + num2
