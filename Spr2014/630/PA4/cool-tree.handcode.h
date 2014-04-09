@@ -55,11 +55,6 @@ typedef Cases_class *Cases;
 virtual void semant() = 0;			\
 virtual void dump_with_types(ostream&, int) = 0;  \
 SymbolTable<Symbol, class__class> clazz; \
-static void semant_error(ostream& error_stream, Symbol filename, tree_node *t, char * msg)\
-{ \
-    error_stream << filename << ":" << t->get_line_number() << ": " << msg << ".\n";\
-}
-
 
 
 #define program_EXTRAS                          \
@@ -194,20 +189,6 @@ void dump_with_types(ostream&,int);  \
     objs = *otable; \
     functs = *ftable; \
     clazz = *ctable; \
-  }
-  
-  #define branch_EXTRAS \
-  	Symbol type_check();\
-  void scan(SymbolTable<Symbol, Symbol>* otable, \
-            SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, class__class>* ctable) { \
-    otable->enterscope(); \
-    otable->addid(name, &type_decl); \
-    expr->scan(otable, ftable, ctable); \
-    objs = *otable; \
-    functs = *ftable; \
-    clazz = *ctable; \
-    otable->exitscope(); \
   }
   
   #define assign_EXTRAS \
