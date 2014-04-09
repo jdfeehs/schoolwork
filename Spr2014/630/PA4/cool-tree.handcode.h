@@ -106,7 +106,7 @@ SymbolTable<Symbol, class__class> clazz;
 void dump_with_types(ostream&,int);    
 
 
-
+/*
 
 
 #define Formal_EXTRAS                              \
@@ -130,13 +130,8 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
     clazz = *ctable; \
   }
 
-
 #define Case_EXTRAS                             \
 virtual void dump_with_types(ostream& ,int) = 0;
-
-
-#define branch_EXTRAS                                   \
-void dump_with_types(ostream& ,int);
 
 
 #define Expression_EXTRAS                    \
@@ -156,14 +151,7 @@ virtual void scan(SymbolTable<Symbol, Symbol>*, \
 
 #define Expression_SHARED_EXTRAS           \
 void dump_with_types(ostream&,int);  \
-void scan(SymbolTable<Symbol, Symbol>* otable, \
-            SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, class__class>* ctable) { \
-    expr->scan(otable, ftable, ctable); \
-    objs = *otable; \
-    functs = *ftable; \
-    clazz = *ctable; \
-  }
+
 
   #define method_EXTRAS \
   Symbol getname() { return name; }\
@@ -455,5 +443,5 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
     functs = *ftable; \
     clazz = *ctable;\
   }
-  
+  */
 #endif
