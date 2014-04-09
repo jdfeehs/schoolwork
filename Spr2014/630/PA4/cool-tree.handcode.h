@@ -12,6 +12,11 @@
 #define yylineno curr_lineno;
 extern int yylineno;
 
+class program_class;
+class class__class;
+class method_class;
+class formal_class;
+
 inline Boolean copy_Boolean(Boolean b) {return b; }
 inline void assert_Boolean(Boolean) {}
 inline void dump_Boolean(ostream& stream, int padding, Boolean b)
