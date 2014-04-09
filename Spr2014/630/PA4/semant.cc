@@ -135,8 +135,8 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
         build_inheritance_graph(classes);
         //cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
-        Symbol first = classes->nth(3)->get_name();
-        Symbol second = classes->nth(4)->get_name();
+        //Symbol first = classes->nth(3)->get_name();
+        //Symbol second = classes->nth(4)->get_name();
         //cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
         //child = classes->nth(i)->get_name();
         //parent = classes->nth(i)->get_parent();
