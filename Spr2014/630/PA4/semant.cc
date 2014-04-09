@@ -134,8 +134,8 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
         build_inheritance_graph(classes);
         //cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
-        //Symbol first = classes->nth(3)->get_name();
-        //Symbol second = classes->nth(4)->get_name();
+        Symbol first = classes->nth(3)->get_name();
+        Symbol second = classes->nth(4)->get_name();
         //cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
         //child = classes->nth(i)->get_name();
         //parent = classes->nth(i)->get_parent();
@@ -175,7 +175,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
  * This method takes in two Symbols (class names)
  * It returns their least common parent (as a Symbol)
  */
-Symbol ClassTable::least_common_parent(Symbol a, Symbol b)
+Symbol least_common_parent(Symbol a, Symbol b)
 {
   Symbol temp_A = a;
   Symbol temp_B = b;
@@ -590,15 +590,183 @@ void class__class::type_check()
      features->nth(i)->type_check();
 }
 
+
+
+
+Symbol method_class::type_check()
+{
+   //Go through all of the lower parts of the tree
+   //for(int i = formals->first(); formals->more(i); i = formals->next(i))
+   //{
+   //  formals->nth(i)->type_check();
+   //}
+   expr->type_check(); //make sure to type-check its expression
+   //This is nowhere near done, but needed to be defined
+   return return_type;
+}
+
+Symbol attr_class::type_check()
+{
+ 
+  Symbol e_type = init->type_check();
+  Symbol decl_type =  *(object_table.lookup(name));
+  if(!test_subclass(e_type,decl_type))
+  {
+    //This is an error
+    semant_error(decl_type,TYPE);
+  }
+  //We will get this far if there were no errors, so return the declared type
+  return decl_type;
+}
+/*
+ * This code implements the rules from the COOL manual
+ * The names/types of objects were found in cool-tree.h
+ */
+Symbol eq_class::type_check()
+{
+  Symbol type1 = e1->type_check();
+  Symbol type2 = e2->type_check();
+  //Deal with tricky cases: are the types nonequal?
+  if(!(type1 == type2))
+  {
+    //if either one is in {Bool,Int,Str}, we have an error
+    if(type1 == Bool || type1 == Int || type1 == Str ||
+       type2 == Bool || type2 == Int || type2 == Str)
+    {
+      semant_error(type1,TYPE);
+    }
+  }
+  //if it makes this far, everything is ok, so return a bool
+  return Bool;
+}
+
+Symbol plus_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);  
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Int;
+}
+
+Symbol sub_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Int;
+}
+
+Symbol mul_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);  
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Int;
+}
+
+Symbol divide_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);  
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Int;
+}
+
+Symbol lt_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);  
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Bool;
+}
+
+Symbol leq_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    semant_Error(e1->type_check(),TYPE);  
+  }
+  if(e2->type_check() != Int)
+  {
+    semant_Error(e2->type_check(),TYPE);  
+  }
+  return Bool;
+}
+
+
+//This is the type check for NOT expressions
+Symbol comp_class::type_check()
+{
+  if(e1->type_check() != Bool)
+  {
+    //This is an error
+  semant_error(e1->type_check(),TYPE);   
+  }
+  return Bool;
+}
+
+//This is the type_check for the negative  expression
+Symbol neg_class::type_check()
+{
+  if(e1->type_check() != Int)
+  {
+    //This is an error
+  semant_error(e1->type_check(),TYPE);   
+  }
+  return Int;
+}
+
+Symbol isvoid_class::type_check()
+{
+  return Bool; //Always a bool
+}
+
+Symbol loop_class::type_check()
+{
+  //Is the first expression a bool?
+  if(pred->type_check() != Bool)
+  {
+    //If not, error
+  semant_error(pred->type_check(),TYPE);   
+  }
+  return Object;
+}
+
 Symbol block_class::type_check()
 {
-  body
+  //The return type of a block is the return type of hte last expr in the block
+  return body->nth(body->len()-1)->type_check();
 }
 
 Symbol assign_class::type_check()
 {
   //If it conforms properly
-  Symbol T_prime = expr->type_check()
+  Symbol T_prime = expr->type_check();
   Symbol T = *(object_table.lookup(name));
   if(test_subclass(T_prime,T))
   {
@@ -606,6 +774,7 @@ Symbol assign_class::type_check()
   }
   else
   {
+    //Find a way to pass errors
     semant_error(name,TYPE);
     return Object; //This will never get called, but I need a return for it to compile
   }
@@ -625,14 +794,17 @@ Symbol cond_class::type_check()
   semant_error(pred->type_check(),TYPE);   
   }
   //The type of an if is the least common parent of the types of its then and else expressions
-  return least_common_parent(then_exp->type_check(),else_exp->type_check);
+  return least_common_parent(then_exp->type_check(),else_exp->type_check());
 }
 
-Symbol new_class::type_check()
+Symbol new__class::type_check()
 { 
   //We don't have to deal with SELF_TYPE, so this is straightforward
   return type_name;
 }
+
+
+//Deal with all of the basic expressions (leaes)
 
 Symbol int_const_class::type_check()
 {
