@@ -50,6 +50,7 @@ typedef Expressions_class *Expressions;
 typedef list_node<Case> Cases_class;
 typedef Cases_class *Cases;
 
+
 #define Program_EXTRAS                          \
 virtual void semant() = 0;			\
 virtual void dump_with_types(ostream&, int) = 0;  \
@@ -73,8 +74,8 @@ SymbolTable<Symbol, method_class> functs;
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
 void dump_with_types(ostream&,int);   \
-Symbol get_parent() { return parent; } \
-Symbol get_name() { return name; } \
+Symbol getparent() { return parent; } \
+Symbol getname() { return name; } \
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -164,6 +165,11 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   }
 
   #define method_EXTRAS \
+  Symbol getname() { return name; }\
+  Formals getformals() { return formals; }\
+  Symbol getreturn() {return return_type; }\
+  Symbol* get_type_addr() { return NULL; }\
+  Boolean is_method() {return true;}\
   Boolean is_method() {return true;} \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
