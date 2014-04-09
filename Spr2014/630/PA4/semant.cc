@@ -623,22 +623,26 @@ Symbol attr_class::type_check()
 //The next few are definitely wrong. They need to return something so it compiles
 Symbol let_class::type_check()
 {
+  set_type(Object);
   return Object;
 }
 
 Symbol dispatch_class::type_check()
 {
+  set_type(Object);
   return Object;
 }
 
 Symbol static_dispatch_class::type_check()
 {
+  set_type(Object);
   return Object;
 }
 
 //We don't need to implement this, but it has to be defined for my method to compile
 Symbol typcase_class::type_check()
 {
+  set_type(Object);
   return Object;
 }
 
@@ -661,6 +665,7 @@ Symbol eq_class::type_check()
     }
   }
   //if it makes this far, everything is ok, so return a bool
+  set_type(Bool);
   return Bool;
 }
 
@@ -674,6 +679,7 @@ Symbol plus_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Int);
   return Int;
 }
 
@@ -687,6 +693,7 @@ Symbol sub_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Int);
   return Int;
 }
 
@@ -700,6 +707,7 @@ Symbol mul_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Int);
   return Int;
 }
 
@@ -713,6 +721,7 @@ Symbol divide_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Int);
   return Int;
 }
 
@@ -726,6 +735,7 @@ Symbol lt_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Bool);
   return Bool;
 }
 
@@ -739,6 +749,7 @@ Symbol leq_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  set_type(Bool);
   return Bool;
 }
 
@@ -751,6 +762,7 @@ Symbol comp_class::type_check()
     //This is an error
     classtable->semant_error(e1->type_check(),TYPE);   
   }
+  set_type(Bool);
   return Bool;
 }
 
@@ -762,11 +774,13 @@ Symbol neg_class::type_check()
     //This is an error
   classtable->semant_error(e1->type_check(),TYPE);   
   }
+  set_type(Int);
   return Int;
 }
 
 Symbol isvoid_class::type_check()
 {
+  set_type(Bool);
   return Bool; //Always a bool
 }
 
@@ -778,13 +792,16 @@ Symbol loop_class::type_check()
     //If not, error
   classtable->semant_error(pred->type_check(),TYPE);   
   }
+  set_type(Object);
   return Object;
 }
 
 Symbol block_class::type_check()
 {
+  Symbol temp = body->nth(body->len()-1)->type_check();
   //The return type of a block is the return type of hte last expr in the block
-  return body->nth(body->len()-1)->type_check();
+  set_type(temp);
+  return temp;
 }
 
 Symbol assign_class::type_check()
@@ -800,14 +817,17 @@ Symbol assign_class::type_check()
   {
     //Find a way to pass errors
     classtable->semant_error(name,TYPE);
+    set_type(Object);
     return Object; //This will never get called, but I need a return for it to compile
   }
 }
 
 Symbol object_class::type_check()
 {
+  Symbol temp = *(object_table.lookup(name));
   //I believe lookup will return a pointer to the Symbol. I want to return the value
-  return *(object_table.lookup(name));
+  set_type(temp);
+  return temp;
 }
 
 Symbol cond_class::type_check()
@@ -818,12 +838,15 @@ Symbol cond_class::type_check()
   classtable->semant_error(pred->type_check(),TYPE);   
   }
   //The type of an if is the least common parent of the types of its then and else expressions
-  return least_common_parent(then_exp->type_check(),else_exp->type_check());
+  Symbol temp = least_common_parent(then_exp->type_check(),else_exp->type_check());
+  set_type(temp);
+  return temp;
 }
 
 Symbol new__class::type_check()
 { 
   //We don't have to deal with SELF_TYPE, so this is straightforward
+  set_type(type_name);
   return type_name;
 }
 
@@ -832,20 +855,24 @@ Symbol new__class::type_check()
 
 Symbol int_const_class::type_check()
 {
+  set_type(Int);
   return Int;
 }
 
 Symbol bool_const_class::type_check()
 {
+  set_type(Int);
   return Bool;
 }
 
 Symbol string_const_class::type_check()
 {
+  set_type(Int);
   return Str;
 }
 
 Symbol no_expr_class::type_check()
 {
+  set_type(No_type);
   return No_type;
 }
