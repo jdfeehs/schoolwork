@@ -590,6 +590,9 @@ void class__class::type_check()
      features->nth(i)->type_check();
 }
 
+
+
+
 Symbol method_class::type_check()
 {
    //Go through all of the lower parts of the tree
@@ -599,14 +602,21 @@ Symbol method_class::type_check()
    //}
    expr->type_check(); //make sure to type-check its expression
    //This is nowhere near done, but needed to be defined
-   return Object; //CHANGE THIS
+   return return_type;
 }
 
 Symbol attr_class::type_check()
 {
-  init->type_check();
-  //Again, not done. Added for completeness
-  return Object;
+ 
+  Symbol e_type = init->type_check();
+  Symbol decl_type =  *(object_table.lookup(name));
+  if(!test_subclass(e_type,decl_type))
+  {
+    //This is an error
+    semant_error(decl_type,TYPE);
+  }
+  //We will get this far if there were no errors, so return the declared type
+  return decl_type;
 }
 /*
  * This code implements the rules from the COOL manual
@@ -647,7 +657,7 @@ Symbol sub_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    semant_Error(e1->type_check(),TYPE);
   }
   if(e2->type_check() != Int)
   {
@@ -792,6 +802,9 @@ Symbol new__class::type_check()
   //We don't have to deal with SELF_TYPE, so this is straightforward
   return type_name;
 }
+
+
+//Deal with all of the basic expressions (leaes)
 
 Symbol int_const_class::type_check()
 {
