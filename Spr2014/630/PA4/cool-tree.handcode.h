@@ -143,7 +143,7 @@ virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, class__class>*) = 0; \
  SymbolTable<Symbol, Symbol> objs; \
  SymbolTable<Symbol, method_class> functs; \
- SymbolTable<Symbol, Class__class> clazz;
+ SymbolTable<Symbol, class__class> clazz;
 
 
 #define Expression_SHARED_EXTRAS           \
