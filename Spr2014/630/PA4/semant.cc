@@ -469,7 +469,7 @@ ostream& ClassTable::semant_error(Class_ c, code error_type)
 		case UNDECLARED:
 			cout << "Undeclared class or inheriting from undeclared class." << endl;
 			break;
-                case TYPE:
+        case TYPE:
 			cout << "Typechecking error in file " << c->get_filename() << endl;
 			break;
 
@@ -497,7 +497,7 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
 		case UNDECLARED:
 		        cout << "Undeclared class or inheriting from undeclared class-." << endl;
 			break;
-                case TYPE:
+        case TYPE:
 			cout << "Typechecking error for Symbol " << s << endl;
 			break;
 	}                                                          

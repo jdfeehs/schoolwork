@@ -54,7 +54,11 @@ typedef Cases_class *Cases;
 #define Program_EXTRAS                          \
 virtual void semant() = 0;			\
 virtual void dump_with_types(ostream&, int) = 0;  \
-SymbolTable<Symbol, class__class> clazz;
+SymbolTable<Symbol, class__class> clazz; \
+static void semant_error(ostream& error_stream, Symbol filename, tree_node *t, char * msg)\
+{ \
+    error_stream << filename << ":" << t->get_line_number() << ": " << msg << ".\n";\
+}
 
 
 
@@ -69,13 +73,15 @@ virtual Symbol get_parent() = 0;  \
 virtual Symbol get_name() = 0; \
 SymbolTable<Symbol, class__class> clazz;  \
 SymbolTable<Symbol, Symbol> objs; \
-SymbolTable<Symbol, method_class> functs;
+SymbolTable<Symbol, method_class> functs; \
+Symbol type_check();
 
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
 void dump_with_types(ostream&,int);   \
 Symbol getparent() { return parent; } \
 Symbol getname() { return name; } \
+Symbol type_check();\
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -100,7 +106,8 @@ virtual void scan(SymbolTable<Symbol, Symbol>*, 			\
                     SymbolTable<Symbol, class__class>*) = 0; \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs; \
-SymbolTable<Symbol, class__class> clazz;
+SymbolTable<Symbol, class__class> clazz;\
+Symbol type_check();
 
 #define Feature_SHARED_EXTRAS                                       \
 void dump_with_types(ostream&,int);    
@@ -113,11 +120,13 @@ virtual void dump_with_types(ostream&,int) = 0; \
                     SymbolTable<Symbol, class__class>*) = 0; \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs; \
-SymbolTable<Symbol, class__class> clazz;
+SymbolTable<Symbol, class__class> clazz; \
+Symbol type_check();
 
 
 #define formal_EXTRAS                           \
-void dump_with_types(ostream&,int); \
+void dump_with_types(ostream&,int); 	\
+Symbol type_check();\
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -143,7 +152,8 @@ virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, class__class>*) = 0; \
  SymbolTable<Symbol, Symbol> objs; \
  SymbolTable<Symbol, method_class> functs; \
- SymbolTable<Symbol, class__class> clazz;
+ SymbolTable<Symbol, class__class> clazz; \
+ Symbol type_check();\
 
 
 #define Expression_SHARED_EXTRAS           \
@@ -157,6 +167,7 @@ void dump_with_types(ostream&,int);  \
  Symbol* get_type_addr() { return NULL; }\
  Boolean is_method() {return true;}\
  Boolean is_method() {return true;} \
+ Symbol type_check();\
  void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -172,6 +183,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define attr_EXTRAS \
+  Symbol type_check();\
   Boolean is_method() { return false; }\
   Symbol get_name() { return name; } \
    void scan(SymbolTable<Symbol, Symbol>* otable,\
@@ -185,6 +197,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define branch_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -198,6 +211,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define assign_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -208,6 +222,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define static_dispatch_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -220,6 +235,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define cond_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
        SymbolTable<Symbol, method_class>* ftable, \
        SymbolTable<Symbol, class__class>* ctable ) { \
@@ -232,6 +248,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define loop_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -243,6 +260,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define block_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -254,6 +272,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define let_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -268,6 +287,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define plus_EXTRAS \
+  	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -279,6 +299,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define sub_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
@@ -290,6 +311,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define mul_EXTRAS \
+  	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -301,6 +323,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define divide_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -312,6 +335,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define neg_EXTRAS \
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -322,6 +346,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define lt_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -333,6 +358,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define eq_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -344,6 +370,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define leq_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -355,6 +382,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define comp_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -365,6 +393,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define int_const_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -374,6 +403,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define bool_const_EXTRAS\
+  	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable ) { \
@@ -383,6 +413,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define string_const_EXTRAS\
+  	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
             SymbolTable<Symbol, class__class>* ctable ) {\
@@ -391,7 +422,9 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
+  
   #define new__EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
             SymbolTable<Symbol, class__class>* ctable ) {\
@@ -401,6 +434,7 @@ void dump_with_types(ostream&,int);  \
   }
   
   #define isvoid_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
             SymbolTable<Symbol, class__class>* ctable ) {\
@@ -410,7 +444,10 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
+  
+  
   #define object_EXTRAS\
+  	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
             SymbolTable<Symbol, class__class>* ctable) {\
