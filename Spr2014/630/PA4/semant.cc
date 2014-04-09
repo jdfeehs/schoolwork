@@ -24,6 +24,7 @@ std::set<Symbol> children;
 SymbolTable<Symbol,method_class> method_table=new SymbolTable<Symbol, method_class>();
 SymbolTable<Symbol,Symbol> object_table=new SymbolTable<Symbol, Symbol>();
 SymbolTable<Symbol,Class__class> class_table=new SymbolTable<Symbol, Class__class>();
+ClassTable *classtable;
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -544,8 +545,8 @@ void program_class::semant()
     //cout << "I sure hope that this is: " << test << endl;
     //test = test_subclass(classes->nth(0)->get_name(),classes->nth(1)->get_name());
     //cout << "But this should be :" << test << endl;
-    ClassTable *classtable = new ClassTable(classes);
-
+    //ClassTable *classtable = new ClassTable(classes);
+    classtable = new ClassTable(classes);
     /* some semantic analysis code may go here */
     /******************************************/
     /*             Manal :)                   */
@@ -584,7 +585,7 @@ void traverse_tree_for_checking(Classes classes)
   }
 }
 
-void class__class::type_check()
+Symbol class__class::type_check()
 {
    for(int i = features->first(); features->more(i); i = features->next(i))
      features->nth(i)->type_check();
@@ -613,7 +614,7 @@ Symbol attr_class::type_check()
   if(!test_subclass(e_type,decl_type))
   {
     //This is an error
-    semant_error(decl_type,TYPE);
+    classtable->semant_error(decl_type,TYPE);
   }
   //We will get this far if there were no errors, so return the declared type
   return decl_type;
@@ -633,7 +634,7 @@ Symbol eq_class::type_check()
     if(type1 == Bool || type1 == Int || type1 == Str ||
        type2 == Bool || type2 == Int || type2 == Str)
     {
-      semant_error(type1,TYPE);
+      classtable->semant_error(type1,TYPE);
     }
   }
   //if it makes this far, everything is ok, so return a bool
@@ -644,11 +645,11 @@ Symbol plus_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    classtable->semant_error(e1->type_check(),TYPE);  
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Int;
 }
@@ -657,11 +658,11 @@ Symbol sub_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);
+    classtable->semant_error(e1->type_check(),TYPE);
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Int;
 }
@@ -670,11 +671,11 @@ Symbol mul_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    classtable->semant_error(e1->type_check(),TYPE);  
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Int;
 }
@@ -683,11 +684,11 @@ Symbol divide_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    classtable->semant_error(e1->type_check(),TYPE);  
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Int;
 }
@@ -696,11 +697,11 @@ Symbol lt_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    classtable->semant_error(e1->type_check(),TYPE);  
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Bool;
 }
@@ -709,11 +710,11 @@ Symbol leq_class::type_check()
 {
   if(e1->type_check() != Int)
   {
-    semant_Error(e1->type_check(),TYPE);  
+    classtable->semant_error(e1->type_check(),TYPE);  
   }
   if(e2->type_check() != Int)
   {
-    semant_Error(e2->type_check(),TYPE);  
+    classtable->semant_error(e2->type_check(),TYPE);  
   }
   return Bool;
 }
@@ -725,7 +726,7 @@ Symbol comp_class::type_check()
   if(e1->type_check() != Bool)
   {
     //This is an error
-  semant_error(e1->type_check(),TYPE);   
+    classtable->semant_error(e1->type_check(),TYPE);   
   }
   return Bool;
 }
@@ -736,7 +737,7 @@ Symbol neg_class::type_check()
   if(e1->type_check() != Int)
   {
     //This is an error
-  semant_error(e1->type_check(),TYPE);   
+  classtable->semant_error(e1->type_check(),TYPE);   
   }
   return Int;
 }
@@ -752,7 +753,7 @@ Symbol loop_class::type_check()
   if(pred->type_check() != Bool)
   {
     //If not, error
-  semant_error(pred->type_check(),TYPE);   
+  classtable->semant_error(pred->type_check(),TYPE);   
   }
   return Object;
 }
@@ -775,7 +776,7 @@ Symbol assign_class::type_check()
   else
   {
     //Find a way to pass errors
-    semant_error(name,TYPE);
+    classtable->semant_error(name,TYPE);
     return Object; //This will never get called, but I need a return for it to compile
   }
 }
@@ -791,7 +792,7 @@ Symbol cond_class::type_check()
   if(pred->type_check() != Bool)
   {
     //This is an error
-  semant_error(pred->type_check(),TYPE);   
+  classtable->semant_error(pred->type_check(),TYPE);   
   }
   //The type of an if is the least common parent of the types of its then and else expressions
   return least_common_parent(then_exp->type_check(),else_exp->type_check());
