@@ -21,9 +21,9 @@ extern int node_lineno;
  */
 std::map<Symbol,Symbol> map;
 std::set<Symbol> children;
-SymbolTable<Symbol,method_class> method_table;//=new SymbolTable<Symbol, method_class>();
-SymbolTable<Symbol,Symbol> object_table;//=new SymbolTable<Symbol, Symbol>();
-SymbolTable<Symbol,Class__class> class_table;//=new SymbolTable<Symbol, Class__class>();
+SymbolTable<Symbol,method_class> *method_table=new SymbolTable<Symbol, method_class>();
+SymbolTable<Symbol,Symbol> *object_table=new SymbolTable<Symbol, Symbol>();
+SymbolTable<Symbol,class__class> *class_table=new SymbolTable<Symbol, class__class>();
 ClassTable *classtable;
 
 //////////////////////////////////////////////////////////////////////
@@ -132,17 +132,17 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 }
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
+	class_table->enterscope();
 
         build_inheritance_graph(classes);
-        //cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
         //Symbol first = classes->nth(3)->get_name();
         //Symbol second = classes->nth(4)->get_name();
         //cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
         //child = classes->nth(i)->get_name();
         //parent = classes->nth(i)->get_parent();
 	//class_table=new SymbolTable<Symbol, class__class>();
+	install_basic_classes();
           
-	//class_table->enterscope();
 	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
 	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
 	{
@@ -169,7 +169,8 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 
 	}
 
-	install_basic_classes();
+        traverse_tree_for_checking(classes);
+
 }
 
 /*
@@ -421,7 +422,7 @@ void ClassTable::traverse(Symbol symbol)
 	object_table->enterscope();
 	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
-	//INSTANTIATEDclass->scan(object_table,method_table,class_table);
+	INSTANTIATEDclass->scan(object_table,method_table,class_table);
 	
 	//Now we can use a multimap to recurse through the tree. This
 	//is very similar to travelling for inheritance.
@@ -610,7 +611,7 @@ Symbol attr_class::type_check()
 {
  
   Symbol e_type = init->type_check();
-  Symbol decl_type =  *(object_table.lookup(name));
+  Symbol decl_type =  *(object_table->lookup(name));
   if(!test_subclass(e_type,decl_type))
   {
     //This is an error
@@ -798,8 +799,13 @@ Symbol loop_class::type_check()
 
 Symbol block_class::type_check()
 {
-  Symbol temp = body->nth(body->len()-1)->type_check();
-  //The return type of a block is the return type of hte last expr in the block
+  Symbol temp;
+	//for(int i = body->first(); body->more(i); i = body->next(i)) 
+  for(int i = body->first(); body->more(i); i = body->next(i))
+  {
+    temp = body->nth(i)->type_check();
+  }
+  //The return type of a block is the return type of the last expr in the block
   set_type(temp);
   return temp;
 }
@@ -808,7 +814,7 @@ Symbol assign_class::type_check()
 {
   //If it conforms properly
   Symbol T_prime = expr->type_check();
-  Symbol T = *(object_table.lookup(name));
+  Symbol T = *(object_table->lookup(name));
   if(test_subclass(T_prime,T))
   {
     return T_prime;
@@ -824,7 +830,7 @@ Symbol assign_class::type_check()
 
 Symbol object_class::type_check()
 {
-  Symbol temp = *(object_table.lookup(name));
+  Symbol temp = *(object_table->lookup(name));
   //I believe lookup will return a pointer to the Symbol. I want to return the value
   set_type(temp);
   return temp;
@@ -861,13 +867,13 @@ Symbol int_const_class::type_check()
 
 Symbol bool_const_class::type_check()
 {
-  set_type(Int);
+  set_type(Bool);
   return Bool;
 }
 
 Symbol string_const_class::type_check()
 {
-  set_type(Int);
+  set_type(Str);
   return Str;
 }
 
