@@ -21,9 +21,9 @@ extern int node_lineno;
  */
 std::map<Symbol,Symbol> map;
 std::set<Symbol> children;
-SymbolTable<Symbol,method_class> method_table=new SymbolTable<Symbol, method_class>();
-SymbolTable<Symbol,Symbol> object_table=new SymbolTable<Symbol, Symbol>();
-SymbolTable<Symbol,Class__class> class_table=new SymbolTable<Symbol, Class__class>();
+SymbolTable<Symbol,method_class> method_table;//=new SymbolTable<Symbol, method_class>();
+SymbolTable<Symbol,Symbol> object_table;//=new SymbolTable<Symbol, Symbol>();
+SymbolTable<Symbol,Class__class> class_table;//=new SymbolTable<Symbol, Class__class>();
 ClassTable *classtable;
 
 //////////////////////////////////////////////////////////////////////
