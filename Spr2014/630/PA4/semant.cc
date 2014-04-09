@@ -21,6 +21,9 @@ extern int node_lineno;
  */
 std::map<Symbol,Symbol> map;
 std::set<Symbol> children;
+SymbolTable<Symbol,method_class> method_table=new SymbolTable<Symbol, method_class>();
+SymbolTable<Symbol,Symbol> object_table=new SymbolTable<Symbol, Symbol>();
+SymbolTable<Symbol,Class__class> class_table=new SymbolTable<Symbol, Class__class>();
 
 //////////////////////////////////////////////////////////////////////
 //
@@ -136,9 +139,9 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
         cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
         //child = classes->nth(i)->get_name();
         //parent = classes->nth(i)->get_parent();
+	//class_table=new SymbolTable<Symbol, class__class>();
           
-	class_table=new SymbolTable<Symbol, class__class>();
-	class_table->enterscope();
+	//class_table->enterscope();
 	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
 	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
 	{
@@ -405,15 +408,15 @@ void ClassTable::install_basic_classes() {
 //traverse the tree using traverse.
 void ClassTable::collect_declarations()
 {
-	method_table=new SymbolTable<Symbol, method_class>();
-	object_table=new SymbolTable<Symbol, Symbol>();
+	//method_table=new SymbolTable<Symbol, method_class>();
+	//object_table=new SymbolTable<Symbol, Symbol>();
 	traverse(Object);
 }
 
 //This will travel the tree and make sure everything is correct & well formed magically! Ah, dreams. :)
 void ClassTable::traverse(Symbol symbol)
 {
-	method_table->enterscope();
+	//method_table->enterscope();
 	object_table->enterscope();
 	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
@@ -426,7 +429,7 @@ void ClassTable::traverse(Symbol symbol)
 	
 	
 	object_table->exitscope();
-	method_table->exitscope();
+	//method_table->exitscope();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -529,11 +532,11 @@ void program_class::semant()
 {
     initialize_constants();
     /* ClassTable constructor may do some semantic analysis */
-    bool test = test_subclass(classes->nth(0)->get_name(),Object);
-    cout << "My two classes were: " << classes->nth(0)->get_name() << " and " << classes->nth(1)->get_name() << endl;
-    cout << "I sure hope that this is: " << test << endl;
-    test = test_subclass(classes->nth(0)->get_name(),classes->nth(1)->get_name());
-    cout << "But this should be :" << test << endl;
+    //bool test = test_subclass(classes->nth(0)->get_name(),Object);
+    //cout << "My two classes were: " << classes->nth(0)->get_name() << " and " << classes->nth(1)->get_name() << endl;
+    //cout << "I sure hope that this is: " << test << endl;
+    //test = test_subclass(classes->nth(0)->get_name(),classes->nth(1)->get_name());
+    //cout << "But this should be :" << test << endl;
     ClassTable *classtable = new ClassTable(classes);
 
     /* some semantic analysis code may go here */
@@ -558,4 +561,25 @@ void program_class::semant()
 	//Nothing else, there's no errors and the nodes have been decorated.
 }
 
+/*
+ *  The following methods wil deal with type checking
+ *  These make the assumptions that there are valid global method and class tables
+ *  those are currently called methodd_table and class_table
+ */
 
+void traverse_tree_for_checking(Classes classes)
+{
+  for(int i = classes->first(); classes->more(i); i = classes->next(i))
+  {
+    //do something with the class?
+    classes->nth(i)->type_check();
+    
+  }
+}
+
+void class__class::type_check()
+{
+   for(int i = features->first(); features->more(i); i = features->next(i))
+     features->nth(i)->type_check();
+}
+ 
