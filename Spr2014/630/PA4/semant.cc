@@ -619,6 +619,29 @@ Symbol attr_class::type_check()
   //We will get this far if there were no errors, so return the declared type
   return decl_type;
 }
+
+//The next few are definitely wrong. They need to return something so it compiles
+Symbol let_class::type_check()
+{
+  return Object;
+}
+
+Symbol dispatch_class::type_check()
+{
+  return Object;
+}
+
+Symbol static_dispatch_class::type_check()
+{
+  return Object;
+}
+
+//We don't need to implement this, but it has to be defined for my method to compile
+Symbol typcase_class::type_check()
+{
+  return Object;
+}
+
 /*
  * This code implements the rules from the COOL manual
  * The names/types of objects were found in cool-tree.h
@@ -820,4 +843,9 @@ Symbol bool_const_class::type_check()
 Symbol string_const_class::type_check()
 {
   return Str;
+}
+
+Symbol no_expr_class::type_check()
+{
+  return No_type;
 }
