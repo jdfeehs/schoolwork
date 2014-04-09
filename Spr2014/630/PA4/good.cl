@@ -118,15 +118,6 @@ class D inherits C{
 	
 };
 class F inherits D {};
-(* class A2I class is declare somewhere else, must include when compliing *)
-class E inherits A2I {
-		convertnum:        Int;
-		adding_result:	   Int;
-		ret_self(): E {self};
-		result(input : String): Int {
-			(let z: A2I <- new A2I in convertnum <- z.a2i(input))
-		};
-};
 Class Main {
 	main():C {
 	  (new C).init(1,true)
