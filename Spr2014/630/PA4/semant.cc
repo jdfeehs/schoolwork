@@ -133,10 +133,10 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 
         build_inheritance_graph(classes);
-        cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
-        Symbol first = classes->nth(3)->getname();
-        Symbol second = classes->nth(4)->getname();
-        cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
+        //cout <<" Least common of IO and Int is: " << least_common_parent(IO,Int) << endl;
+        //Symbol first = classes->nth(3)->get_name();
+        //Symbol second = classes->nth(4)->get_name();
+        //cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
         //child = classes->nth(i)->get_name();
         //parent = classes->nth(i)->get_parent();
 	//class_table=new SymbolTable<Symbol, class__class>();
@@ -151,7 +151,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 		//This should test for any duplicates
 		if (class_table->probe(INSTANTIATEDclass->get_name())!=NULL)
 			semant_error(INSTANTIATEDclass, DUPLICATE);
-		
+
 		class_table->addid(INSTANTIATEDclass->get_name(), INSTANTIATEDclass);
 	
 		//Now we look for any illegal redeclarations
@@ -182,18 +182,18 @@ Symbol ClassTable::least_common_parent(Symbol a, Symbol b)
   //Take care of the easy cases
   while(temp_A != Object){
     if(test_subclass(temp_A,temp_B)){
-        cout << "Result 1" << endl;
+        //cout << "Result 1" << endl;
 	return temp_B;}
     if(test_subclass(temp_B,temp_A)){
-        cout << "Result 2" << endl;
+        //cout << "Result 2" << endl;
 	return temp_A;}
     while(temp_B != Object){
       temp_B = map[temp_B];
       if(test_subclass(temp_A,temp_B)){
-        cout << "Result 3" << endl;
+        //cout << "Result 3" << endl;
 	return temp_B;}
       if(test_subclass(temp_B,temp_A)){
-        cout << "Result 4" << endl;
+        //cout << "Result 4" << endl;
 	return temp_A;}
     }
     temp_A = map[temp_A];
@@ -469,6 +469,10 @@ ostream& ClassTable::semant_error(Class_ c, code error_type)
 		case UNDECLARED:
 			cout << "Undeclared class or inheriting from undeclared class." << endl;
 			break;
+                case TYPE:
+			cout << "Typechecking error in file " << c->get_filename() << endl;
+			break;
+
 	}                                                          
     return semant_error(c->get_filename(),c);
 }    
@@ -492,6 +496,9 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
 			break;
 		case UNDECLARED:
 		        cout << "Undeclared class or inheriting from undeclared class-." << endl;
+			break;
+                case TYPE:
+			cout << "Typechecking error for Symbol " << s << endl;
 			break;
 	}                                                          
     return semant_error(); //not sure how to get the class to send the line number
@@ -564,7 +571,7 @@ void program_class::semant()
 /*
  *  The following methods wil deal with type checking
  *  These make the assumptions that there are valid global method and class tables
- *  those are currently called methodd_table and class_table
+ *  those are currently called method_table and class_table
  */
 
 void traverse_tree_for_checking(Classes classes)
@@ -582,4 +589,62 @@ void class__class::type_check()
    for(int i = features->first(); features->more(i); i = features->next(i))
      features->nth(i)->type_check();
 }
- 
+
+Symbol block_class::type_check()
+{
+  body
+}
+
+Symbol assign_class::type_check()
+{
+  //If it conforms properly
+  Symbol T_prime = expr->type_check()
+  Symbol T = *(object_table.lookup(name));
+  if(test_subclass(T_prime,T))
+  {
+    return T_prime;
+  }
+  else
+  {
+    semant_error(name,TYPE);
+    return Object; //This will never get called, but I need a return for it to compile
+  }
+}
+
+Symbol object_class::type_check()
+{
+  //I believe lookup will return a pointer to the Symbol. I want to return the value
+  return *(object_table.lookup(name));
+}
+
+Symbol cond_class::type_check()
+{
+  if(pred->type_check() != Bool)
+  {
+    //This is an error
+  semant_error(pred->type_check(),TYPE);   
+  }
+  //The type of an if is the least common parent of the types of its then and else expressions
+  return least_common_parent(then_exp->type_check(),else_exp->type_check);
+}
+
+Symbol new_class::type_check()
+{ 
+  //We don't have to deal with SELF_TYPE, so this is straightforward
+  return type_name;
+}
+
+Symbol int_const_class::type_check()
+{
+  return Int;
+}
+
+Symbol bool_const_class::type_check()
+{
+  return Bool;
+}
+
+Symbol string_const_class::type_check()
+{
+  return Str;
+}

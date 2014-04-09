@@ -13,7 +13,7 @@
 #define FALSE 0
 
 //We use these codes when reporting errors.
-enum code{REDEFINITION,CYCLE,DUPLICATE,INHERIT,UNDECLARED};
+enum code{REDEFINITION,CYCLE,DUPLICATE,INHERIT,UNDECLARED,TYPE};
 
 class ClassTable;
 typedef ClassTable *ClassTableP;
