@@ -8,6 +8,7 @@
 #include "tree.h"
 #include "cool.h"
 #include "stringtab.h"
+#include "symtab.h"
 #define yylineno curr_lineno;
 extern int yylineno;
 
@@ -60,7 +61,9 @@ virtual Symbol get_filename() = 0;      \
 virtual void dump_with_types(ostream&,int) = 0; \
 virtual Symbol get_parent() = 0;  \
 virtual Symbol get_name() = 0; \
-SymbolTable<Symbol, class__class> clazz;
+SymbolTable<Symbol, class__class> clazz;  \
+SymbolTable<Symbol, Symbol> objs; \
+SymbolTable<Symbol, method_class> functs;
 
 #define class__EXTRAS                                 \
 Symbol get_filename() { return filename; }             \
