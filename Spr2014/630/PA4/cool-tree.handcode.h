@@ -12,6 +12,11 @@
 #define yylineno curr_lineno;
 extern int yylineno;
 
+class program_class;
+class class__class;
+class method_class;
+class formal_class;
+
 inline Boolean copy_Boolean(Boolean b) {return b; }
 inline void assert_Boolean(Boolean) {}
 inline void dump_Boolean(ostream& stream, int padding, Boolean b)
@@ -49,7 +54,7 @@ typedef Cases_class *Cases;
 #define Program_EXTRAS                          \
 virtual void semant() = 0;			\
 virtual void dump_with_types(ostream&, int) = 0;  \
-SymbolTable<Symbol, Class__class> clazz;
+SymbolTable<Symbol, class__class> clazz;
 
 
 
@@ -62,7 +67,7 @@ virtual Symbol get_filename() = 0;      \
 virtual void dump_with_types(ostream&,int) = 0; \
 virtual Symbol get_parent() = 0;  \
 virtual Symbol get_name() = 0; \
-SymbolTable<Symbol, Class__class> clazz;  \
+SymbolTable<Symbol, class__class> clazz;  \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs;
 
@@ -73,7 +78,7 @@ Symbol getparent() { return parent; } \
 Symbol getname() { return name; } \
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     for(int i = features->first(); features->more(i); i = features->next(i)) { \
       Feature_class* a_feature = (Feature_class*)features->nth(i); \
       if (a_feature->is_method()) \
@@ -92,10 +97,10 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
 virtual void dump_with_types(ostream&,int) = 0; 		\
 virtual void scan(SymbolTable<Symbol, Symbol>*, 			\
                     SymbolTable<Symbol, method_class>*,		\
-                    SymbolTable<Symbol, Class__class>*) = 0; \
+                    SymbolTable<Symbol, class__class>*) = 0; \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs; \
-SymbolTable<Symbol, Class__class> clazz;
+SymbolTable<Symbol, class__class> clazz;
 
 #define Feature_SHARED_EXTRAS                                       \
 void dump_with_types(ostream&,int);    
@@ -108,17 +113,17 @@ void dump_with_types(ostream&,int);
 virtual void dump_with_types(ostream&,int) = 0; \
  virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, method_class>*, \
-                    SymbolTable<Symbol, Class__class>*) = 0; \
+                    SymbolTable<Symbol, class__class>*) = 0; \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs; \
-SymbolTable<Symbol, Class__class> clazz;
+SymbolTable<Symbol, class__class> clazz;
 
 
 #define formal_EXTRAS                           \
 void dump_with_types(ostream&,int); \
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     otable->addid(name, &type_decl); \
     objs = *otable; \
     functs = *ftable; \
@@ -143,7 +148,7 @@ void dump_type(ostream&, int);               \
 Expression_class() { type = (Symbol) NULL; } \
 virtual void scan(SymbolTable<Symbol, Symbol>*, \
                     SymbolTable<Symbol, method_class>*, \
-                    SymbolTable<Symbol, Class__class>*) = 0; \
+                    SymbolTable<Symbol, class__class>*) = 0; \
  SymbolTable<Symbol, Symbol> objs; \
  SymbolTable<Symbol, method_class> functs; \
  SymbolTable<Symbol, Class__class> clazz;
@@ -153,7 +158,7 @@ virtual void scan(SymbolTable<Symbol, Symbol>*, \
 void dump_with_types(ostream&,int);  \
 void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     expr->scan(otable, ftable, ctable); \
     objs = *otable; \
     functs = *ftable; \
@@ -169,7 +174,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   Boolean is_method() {return true;} \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     otable->enterscope(); \
     for (int i = formals->first(); formals->more(i); \
          i = formals->next(i)) \
@@ -186,7 +191,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   Symbol get_name() { return name; } \
    void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     if (init) \
       init->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -197,7 +202,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define branch_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     otable->enterscope(); \
     otable->addid(name, &type_decl); \
     expr->scan(otable, ftable, ctable); \
@@ -210,7 +215,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define assign_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     expr->scan(otable, ftable, ctable); \
     objs = *otable; \
     functs = *ftable; \
@@ -220,7 +225,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define static_dispatch_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     for(int i = actual->first(); actual->more(i); i = actual->next(i)) \
       actual->nth(i)->scan(otable, ftable, ctable); \
     expr->scan(otable, ftable, ctable); \
@@ -232,7 +237,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define cond_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
        SymbolTable<Symbol, method_class>* ftable, \
-       SymbolTable<Symbol, Class__class>* ctable ) { \
+       SymbolTable<Symbol, class__class>* ctable ) { \
     pred->scan(otable, ftable, ctable); \
     then_exp->scan(otable, ftable, ctable); \
     else_exp->scan(otable, ftable, ctable); \
@@ -244,7 +249,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define loop_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     pred->scan(otable, ftable, ctable); \
     body->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -255,7 +260,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define typcase_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     expr->scan(otable, ftable, ctable); \
     for(int i = cases->first(); cases->more(i); i = cases->next(i)) \
       cases->nth(i)->scan(otable, ftable, ctable); \
@@ -267,7 +272,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define block_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     for(int i = body->first(); body->more(i); i = body->next(i)) \
       body->nth(i)->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -278,7 +283,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define let_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     otable->enterscope(); \
     otable->addid(identifier, &type_decl); \
     init->scan(otable, ftable, ctable); \
@@ -292,7 +297,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define plus_EXTRAS \
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -303,7 +308,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define sub_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable) { \
+            SymbolTable<Symbol, class__class>* ctable) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -314,7 +319,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define mul_EXTRAS \
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -336,7 +341,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define neg_EXTRAS \
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     objs = *otable; \
     functs = *ftable; \
@@ -346,7 +351,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define lt_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable;\
@@ -357,7 +362,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define eq_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -368,7 +373,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define leq_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     e2->scan(otable, ftable, ctable); \
     objs = *otable; \
@@ -379,7 +384,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define comp_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     e1->scan(otable, ftable, ctable); \
     objs = *otable; \
     functs = *ftable; \
@@ -389,7 +394,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define int_const_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     objs = *otable; \
     functs = *ftable; \
     clazz = *ctable; \
@@ -398,7 +403,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define bool_const_EXTRAS\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
-            SymbolTable<Symbol, Class__class>* ctable ) { \
+            SymbolTable<Symbol, class__class>* ctable ) { \
     objs = *otable; \
     functs = *ftable; \
     clazz = *ctable; \
@@ -407,7 +412,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define string_const_EXTRAS\
    void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
-            SymbolTable<Symbol, Class__class>* ctable ) {\
+            SymbolTable<Symbol, class__class>* ctable ) {\
     objs = *otable;\
     functs = *ftable;\
     clazz = *ctable;\
@@ -416,7 +421,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define new__EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
-            SymbolTable<Symbol, Class__class>* ctable ) {\
+            SymbolTable<Symbol, class__class>* ctable ) {\
     objs = *otable;\
     functs = *ftable;\
     clazz = *ctable;\
@@ -425,7 +430,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define isvoid_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
-            SymbolTable<Symbol, Class__class>* ctable ) {\
+            SymbolTable<Symbol, class__class>* ctable ) {\
     e1->scan(otable, ftable, ctable);\
     objs = *otable;\
     functs = *ftable;\
@@ -435,7 +440,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define no_expr_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
-            SymbolTable<Symbol, Class__class>* ctable ) {\
+            SymbolTable<Symbol, class__class>* ctable ) {\
     e1->scan(otable, ftable, ctable);\
     objs = *otable;\
     functs = *ftable;\
@@ -445,7 +450,7 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
   #define object_EXTRAS\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable,\
-            SymbolTable<Symbol, Class__class>* ctable) {\
+            SymbolTable<Symbol, class__class>* ctable) {\
     objs = *otable;\
     functs = *ftable; \
     clazz = *ctable;\
