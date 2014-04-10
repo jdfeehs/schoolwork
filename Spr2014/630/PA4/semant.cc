@@ -133,7 +133,6 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 	class_table->enterscope();
-
         build_inheritance_graph(classes);
         //Symbol first = classes->nth(3)->get_name();
         //Symbol second = classes->nth(4)->get_name();
@@ -580,6 +579,7 @@ void traverse_tree_for_checking(Classes classes)
 {
   for(int i = classes->first(); classes->more(i); i = classes->next(i))
   {
+        cout << "here1" << endl;
     //do something with the class?
     classes->nth(i)->type_check();
     
@@ -588,6 +588,8 @@ void traverse_tree_for_checking(Classes classes)
 
 Symbol class__class::type_check()
 {
+        cout << "here2" << endl;
+
    for(int i = features->first(); features->more(i); i = features->next(i))
      features->nth(i)->type_check();
 }
@@ -602,6 +604,8 @@ Symbol method_class::type_check()
    //{
    //  formals->nth(i)->type_check();
    //}
+        cout << "here3" << endl;
+
    expr->type_check(); //make sure to type-check its expression
    //This is nowhere near done, but needed to be defined
    return return_type;
@@ -609,6 +613,7 @@ Symbol method_class::type_check()
 
 Symbol attr_class::type_check()
 {
+        cout << "hereinattr" << endl;
  
   Symbol e_type = init->type_check();
   Symbol decl_type =  *(object_table->lookup(name));
@@ -617,6 +622,7 @@ Symbol attr_class::type_check()
     //This is an error
     classtable->semant_error(decl_type,TYPE);
   }
+        cout << "hereinattr" << endl;
   //We will get this far if there were no errors, so return the declared type
   return decl_type;
 }
@@ -812,11 +818,16 @@ Symbol block_class::type_check()
 
 Symbol assign_class::type_check()
 {
+        cout << "here4" << endl;
+
   //If it conforms properly
   Symbol T_prime = expr->type_check();
+  cout << "before object table "<< endl;
   Symbol T = *(object_table->lookup(name));
   if(test_subclass(T_prime,T))
   {
+    cout << "t_prime" << endl;
+    set_type(T_prime);
     return T_prime;
   }
   else
@@ -824,12 +835,15 @@ Symbol assign_class::type_check()
     //Find a way to pass errors
     classtable->semant_error(name,TYPE);
     set_type(Object);
+        cout << "here5" << endl;
+
     return Object; //This will never get called, but I need a return for it to compile
   }
 }
 
 Symbol object_class::type_check()
 {
+  cout << "here in object class" << endl;
   Symbol temp = *(object_table->lookup(name));
   //I believe lookup will return a pointer to the Symbol. I want to return the value
   set_type(temp);
