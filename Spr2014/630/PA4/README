@@ -176,3 +176,27 @@ than one parent. In order to detect this, whenever a class type is added to the
 multimap as a child, it is added to our set. This means that if at any point,
 it is time to add the new child to the set, but that class type is already in
 our set, there must be a cycle.
+
+--Type/Semantic checking--
+For type & semantic checking, first duplicates and illegal redefinitions are
+searched for in the ClassTable's constructor. For type checking and all other
+semantic errors a traverse method was developed. This method, which has calls
+a function scan() for each class node in the AST, collects all visible 
+features of a by calling the scan() function of every feature of every node in the
+AST. Each node stores the information by keeping a copy of 3 symbol tables:
+one for objects, another for functions, and one more for classes, along with proper
+scope. Once the nodes have been populated, type checking, along with semantics is 
+performed by several functions in semant.cc (that is, each type of node has its own 
+version, following the rules set in the COOL manual). This makes the task easier, since
+most tests just involve looking at the symbol tables for each node. If any errors are caught 
+semant_error is called which displays a proper error message. If type checking is passed, 
+then that node's type is set via a set_type method. If any errors were caught after all the 
+type & semantic checking is complete, then the program exits after displaying:
+"Compilation halted due to static semantic errors."
+
+--Testing--
+For testing, we try most combinations of assignment and inheritance, self and normal
+dispatch, normal operations, from several different functions and classes that inherit.
+For bad testing, we check for non-existent functions and classes, undefined operations
+(such as adding a string and integer), duplicate classes and functions . More details about exact errors can be found
+as comments in both good and bad test files.

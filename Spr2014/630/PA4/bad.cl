@@ -13,7 +13,7 @@ class C {
 
 		 result(num1 : Int) : Int { 
 		 	{
-				 not 22;  (* illgal use of not passing in a int when expecting a bool *)
+				 not 22;  (* illegal use of not passing in a int when expecting a bool *)
 				 ~false;  (* wrong return type and use of ~ *)
 		 	}
 	    }; 
@@ -24,8 +24,8 @@ Class Main {
 	num 	   : Int <- 23 +"43"+1; (* adding a string when expecting all in *)
 	num_string : String <- "32" + 1 + false; (* for a string adding a int and bool *)
 	test       : Bool <- "hello"; (* wrong type string instead bool *)
-	testing    : Bool <- not 2;   (* wrong type of assigmenet*)
-	testing    : String <- ~2;	  (* wrong type of assigment*)
+	testing    : Bool <- not 2;   (* wrong type of assignment*)
+	testing    : String <- ~2;	  (* wrong type of assignment*)
 
 	main():C {
 	 {
@@ -40,7 +40,7 @@ Class Main {
 	  (new B)@A.init(23,true);(* Expression type B does not conform to declared static dispatch type A. *)
 	  (new A)@C.main();       (* Static dispatch to unknown method*)
 	  (new A)@Object.print("Hello World!\n"); (*no such fuction print*)
-	  (new A2I)@E.ret_self(self); (*Decleartion error static dispatch: Expression type A2I does not conform to declared static dispatch type E*)
+	  (new A2I)@E.ret_self(self); (*Declaration error static dispatch: Expression type A2I does not conform to declared static dispatch type E*)
 	  (new Object)@E.copy();
 	  (new C);
 	  "HI"+1; (*adding a string and int*)
@@ -59,7 +59,7 @@ class E inherits A2I {
 		result(input : String): Int {
 			{
 			 (let s: A2I <- new A2I in convertnum <- z.i2a(input+1)); (*Wrong input string + int and wrong fuction and z is used but not declared*)
-			convertnum_string <- true; (*Wrong assigment*)
+			convertnum_string <- true; (*Wrong assignment*)
 			never_seen_before; (*not declared*)
 			}
 		};
@@ -70,17 +70,17 @@ Class B inherits C {
 	r2   : Int;
 	b 	 : Bool;
 	flag : Bool <- true;
-	(*a differenet return type from method in class C*)
+	(*a different return type from method in class C*)
 	init(x : Int, y : Bool) : Int { 
 		{
 		while flag loop 
 			{
 				r <- x + 2 +"String"; (* adding a string to an int result *)
-				r2 <- use_later; (*declared in parent but not initlized *)
+				r2 <- use_later; (*declared in parent but not initialized *)
 				b <- y;
 			}
 		pool;
-		if flag+not ture then y <- flag+flase else flag <- y+1 fi; (*improrper use of + with bool *)
+		if flag+not true then y <- flag+flase else flag <- y+1 fi; (*improper use of + with bool *)
 		}
 	};
 };

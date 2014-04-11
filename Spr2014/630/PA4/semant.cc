@@ -554,7 +554,7 @@ void program_class::semant()
 }
 
 /*
- *  The following methods wil deal with type checking
+ *  The following methods will deal with type checking
  *  These make the assumptions that there are valid global method and class tables
  *  those are currently called method_table and class_table
  */
