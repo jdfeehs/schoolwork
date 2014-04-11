@@ -85,5 +85,5 @@ Class B inherits C {
 	};
 };
 Class Cycle_A inherits A{};
-
+class B inherits C {};
 Class Cycle_B inherits Cycle_A{};

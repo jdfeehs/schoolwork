@@ -176,3 +176,5 @@ than one parent. In order to detect this, whenever a class type is added to the
 multimap as a child, it is added to our set. This means that if at any point,
 it is time to add the new child to the set, but that class type is already in
 our set, there must be a cycle.
+
+As for test case in both bad.cl and good.cl, The idea behind is to simply test for semantic error, These semantic errors include but not limited to declartion of fuctions and types,dispatch cycles and passing in the wrong paramaters. For the good.cl the program does not have an outcome if it was to be run, which in order to complete the good.cl and check we complied it using the coolc command and ran it through spim. As for the bad.cl test case we started off by passing wrong paramaters, wrong declaration and including cycles. In the bad.cl we repated error to rankup the errors to 50 which the max that complier can handle. In bad.cl next to each intended error we commented what semantic error we are testing. In both good.cl and bad.cl we tried to test for all possible combontation.   
