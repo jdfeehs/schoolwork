@@ -129,8 +129,8 @@ virtual void dump_with_types(ostream&,int) = 0; \
 SymbolTable<Symbol, Symbol> objs; \
 SymbolTable<Symbol, method_class> functs; \
 SymbolTable<Symbol, class__class> clazz; \
-Symbol type_check();
-
+Symbol type_check();\
+virtual Symbol get_type() = 0;
 
 #define formal_EXTRAS                           \
 void dump_with_types(ostream&,int); 	\
@@ -142,8 +142,8 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
     objs = *otable; \
     functs = *ftable; \
     clazz = *ctable; \
-  }
-
+  }\
+Symbol get_type() {return type_decl;}
 #define Case_EXTRAS                             \
 virtual void dump_with_types(ostream& ,int) = 0;
 
@@ -170,8 +170,8 @@ void dump_with_types(ostream&,int);  \
 
  #define method_EXTRAS \
  Symbol get_name() { return name; }\
- Formals getformals() { return formals; }\
- Symbol getreturn() {return return_type; }\
+ Formals get_formals() { return formals; }\
+ Symbol get_return() {return return_type; }\
  Symbol* get_type_addr() { return NULL; }\
  Boolean is_method() {return true;}\
  Symbol type_check();\

@@ -638,8 +638,22 @@ Symbol let_class::type_check()
 
 Symbol dispatch_class::type_check()
 {
-  set_type(Object);
-  return Object;
+  //Get the method_class from the method table- this way comparisons can be done
+  method_class * cur_method = method_table->lookup(name);
+  expr->get_type();
+  Symbol cur_expr_type;
+  //cout << "name is " << name << endl;
+  for(int i = actual->first(); actual->more(i); i = actual->next(i)){
+    //Here, I want to check each of the dispach's expressions types
+    cur_expr_type = actual->nth(i)->type_check();
+    //cout << "confirm my suspicions " << name << endl;
+    if(cur_expr_type != cur_method->get_formals()->nth(i)->get_type()){
+      classtable->semant_error(cur_expr_type,TYPE);
+    }
+  }
+  Symbol ret = cur_method->get_return();
+  set_type(ret);
+  return ret;
 }
 
 Symbol static_dispatch_class::type_check()
