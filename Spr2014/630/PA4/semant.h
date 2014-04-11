@@ -30,9 +30,9 @@ private:
  
   ostream& error_stream;
   //Table for each class, such that the comments hold below.
-  SymbolTable<Symbol,class__class> *class_table;  //class name -> class address
-  SymbolTable<Symbol,method_class> *method_table; //method name -> method address
-  SymbolTable<Symbol,Symbol>       *object_table; //object name -> static type
+  //SymbolTable<Symbol,class__class> *class_table;  //class name -> class address
+  //SymbolTable<Symbol,method_class> *method_table; //method name -> method address
+  //SymbolTable<Symbol,Symbol>       *object_table; //object name -> static type
 
 public:
   ClassTable(Classes);
@@ -45,9 +45,9 @@ public:
   void build_inheritance_graph(Classes classes);
   void traverse(Symbol symbol);
   Symbol least_common_parent(Symbol a, Symbol b);
-  void collect_declarations();
+  void collect_definitions(Classes classes);
 };
-
-
+void traverse_tree_for_checking(Classes classes);
+Symbol least_common_parent(Symbol a, Symbol b);
 #endif
 

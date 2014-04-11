@@ -114,6 +114,9 @@ bool test_subclass(Symbol class_a, Symbol class_b)
   else if (class_a == Object){
     return false;
   }
+  else if (class_a == class_b){
+    return true;
+  }
   Symbol child = class_a;
   Symbol parent = map[class_a];
   counter = 0;
@@ -133,6 +136,7 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
 	class_table->enterscope();
+        method_table->enterscope();
         build_inheritance_graph(classes);
         //Symbol first = classes->nth(3)->get_name();
         //Symbol second = classes->nth(4)->get_name();
@@ -166,7 +170,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 			semant_error(INSTANTIATEDclass, REDEFINITION);
 
 	}
-		collect_definitions();
+        collect_definitions(classes);
         traverse_tree_for_checking(classes);
 
 }
@@ -405,7 +409,7 @@ void ClassTable::install_basic_classes() {
 }
 
 //This will collect all local definitions and put them in a node's table
-void ClassTable::collect_definitions()
+void ClassTable::collect_definitions(Classes classes)
 {
 	//method_table->enterscope();
 	object_table->enterscope();
@@ -491,7 +495,7 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
 		        cout << "Undeclared class or inheriting from undeclared class-." << endl;
 			break;
         case TYPE:
-			cout << "Typechecking error for Symbol " << s << endl;
+			cout << "Typechecking error for Symbol " << s  << endl;
 			break;
 	}                                                          
     return semant_error(); //not sure how to get the class to send the line number
@@ -614,8 +618,20 @@ Symbol attr_class::type_check()
 //The next few are definitely wrong. They need to return something so it compiles
 Symbol let_class::type_check()
 {
-  set_type(Object);
-  return Object;
+  //if(init != no_expr
+  //first, check the init expression
+  Symbol init_type = init->type_check();
+  if(init_type != No_type)
+  {
+    if(!test_subclass(init_type,type_decl))
+    {
+      classtable->semant_error(init_type,TYPE);
+    }
+  }
+  Symbol ret = body->type_check();
+  
+  set_type(ret);
+  return ret;
 }
 
 Symbol dispatch_class::type_check()
@@ -807,7 +823,8 @@ Symbol assign_class::type_check()
   //If it conforms properly
   Symbol T_prime = expr->type_check();
   cout << "before object table "<< endl;
-  Symbol T = *(object_table->lookup(name));
+  Symbol T = *(objs.lookup(name));
+  cout << "T is " << T << " and T_prime is: " << T_prime << endl;
   if(test_subclass(T_prime,T))
   {
     cout << "t_prime" << endl;
@@ -828,8 +845,9 @@ Symbol assign_class::type_check()
 Symbol object_class::type_check()
 {
   cout << "here in object class" << endl;
-  Symbol temp = *(object_table->lookup(name));
+  Symbol temp = *(objs.lookup(name));
   //I believe lookup will return a pointer to the Symbol. I want to return the value
+  cout << "magic happens" << endl;
   set_type(temp);
   return temp;
 }
