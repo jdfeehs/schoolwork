@@ -198,5 +198,7 @@ type & semantic checking is complete, then the program exits after displaying:
 For testing, we try most combinations of assignment and inheritance, self and normal
 dispatch, normal operations, from several different functions and classes that inherit.
 For bad testing, we check for non-existent functions and classes, undefined operations
-(such as adding a string and integer), duplicate classes and functions . More details about exact errors can be found
-as comments in both good and bad test files.
+(such as adding a string and integer, or passing wrong parameter types), and duplicate classes 
+and functions. More details about exact errors can be found as comments in both good and 
+bad test files.
+
