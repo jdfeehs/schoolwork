@@ -142,7 +142,6 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 	//class_table=new SymbolTable<Symbol, class__class>();
 	install_basic_classes();
           
-	//Put the stuff in to check for duplicates and unpermitted redeclarations... do later
 	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
 	{
 		class__class *INSTANTIATEDclass=(class__class *)(classes->nth(i));
@@ -167,7 +166,7 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 			semant_error(INSTANTIATEDclass, REDEFINITION);
 
 	}
-
+		collect_definitions();
         traverse_tree_for_checking(classes);
 
 }
@@ -405,23 +404,16 @@ void ClassTable::install_basic_classes() {
 	class_table->addid(Str, (class__class *)Str_class);
 }
 
-//Collect declarations for method and objects: we create symbol tables and then
-//traverse the tree using traverse.
-void ClassTable::collect_declarations()
-{
-	//method_table=new SymbolTable<Symbol, method_class>();
-	//object_table=new SymbolTable<Symbol, Symbol>();
-	traverse(Object);
-}
-
-//This will travel the tree and make sure everything is correct & well formed magically! Ah, dreams. :)
-void ClassTable::traverse(Symbol symbol)
+//This will collect all local definitions and put them in a node's table
+void ClassTable::collect_definitions()
 {
 	//method_table->enterscope();
 	object_table->enterscope();
-	class__class *INSTANTIATEDclass = class_table->lookup(symbol);
+	//class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
-	INSTANTIATEDclass->scan(object_table,method_table,class_table);
+	//INSTANTIATEDclass->scan(object_table,method_table,class_table);
+	for(int i = classes->first(); classes->more(i); i = classes->next(i))
+		classes->nth(i)->scan(object_table,method_table,class_table);
 	
 	//Now we can use a multimap to recurse through the tree. This
 	//is very similar to travelling for inheritance.
@@ -558,14 +550,6 @@ void program_class::semant()
 	exit(1);
     }
 
-    //We begin by collecting the declarations, see it above. It works, but it calls a method that does
-    //not exist yet. In short, DON'T uncomment the line below until we're ready to begin the chaos.
-    //classtable->collect_declaration();
-	//Add type checking here. We can do something crazy like this->typecheck and attach it to each node (XD)
-	//or make a helper method or something:
-	//if(typecheckingthing and node decoration has errors)
-		//cout << "Compilation halted due to static semantic errors." << endl;
-		//exit(1)
 	//Nothing else, there's no errors and the nodes have been decorated.
 }
 
