@@ -567,7 +567,7 @@ void traverse_tree_for_checking(Classes classes)
 {
   for(int i = classes->first(); classes->more(i); i = classes->next(i))
   {
-        cout << "here1" << endl;
+        //cout << "here1" << endl;
     //do something with the class?
     classes->nth(i)->type_check();
     
@@ -576,8 +576,8 @@ void traverse_tree_for_checking(Classes classes)
 
 Symbol class__class::type_check()
 {
-        cout << "here2" << endl;
-
+        //cout << "here2" << endl;
+   //cout << "class is " << name << endl;
    for(int i = features->first(); features->more(i); i = features->next(i))
      features->nth(i)->type_check();
 }
@@ -592,7 +592,7 @@ Symbol method_class::type_check()
    //{
    //  formals->nth(i)->type_check();
    //}
-        cout << "here3" << endl;
+        //cout << "here3" << endl;
 
    expr->type_check(); //make sure to type-check its expression
    //This is nowhere near done, but needed to be defined
@@ -601,16 +601,18 @@ Symbol method_class::type_check()
 
 Symbol attr_class::type_check()
 {
-        cout << "hereinattr" << endl;
+        //cout << "hereinattr" << endl;
  
   Symbol e_type = init->type_check();
-  Symbol decl_type =  *(object_table->lookup(name));
-  if(!test_subclass(e_type,decl_type))
+  Symbol decl_type =  *(objs.lookup(name));
+  //cout << "e_type is " << e_type << " and decl_type is " << decl_type << endl;
+  //cout << name << endl;
+  if(!test_subclass(e_type,decl_type) && e_type != No_type)
   {
     //This is an error
     classtable->semant_error(decl_type,TYPE);
   }
-        cout << "hereinattr" << endl;
+        //cout << "hereinattr" << endl;
   //We will get this far if there were no errors, so return the declared type
   return decl_type;
 }
@@ -686,6 +688,7 @@ Symbol plus_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
+  //cout << "IAMINPLUS" << endl;
   set_type(Int);
   return Int;
 }
@@ -799,6 +802,7 @@ Symbol loop_class::type_check()
     //If not, error
   classtable->semant_error(pred->type_check(),TYPE);   
   }
+  body->type_check();
   set_type(Object);
   return Object;
 }
@@ -818,16 +822,17 @@ Symbol block_class::type_check()
 
 Symbol assign_class::type_check()
 {
-        cout << "here4" << endl;
+        //cout << "here4" << endl;
 
   //If it conforms properly
+  //cout << "name is " << name << " and expr type is " << expr->type_check() << endl;
   Symbol T_prime = expr->type_check();
-  cout << "before object table "<< endl;
+  //cout << "before object table "<< endl;
   Symbol T = *(objs.lookup(name));
-  cout << "T is " << T << " and T_prime is: " << T_prime << endl;
+  //cout << "T is " << T << " and T_prime is: " << T_prime << endl;
   if(test_subclass(T_prime,T))
   {
-    cout << "t_prime" << endl;
+    //cout << "t_prime" << endl;
     set_type(T_prime);
     return T_prime;
   }
@@ -836,7 +841,7 @@ Symbol assign_class::type_check()
     //Find a way to pass errors
     classtable->semant_error(name,TYPE);
     set_type(Object);
-        cout << "here5" << endl;
+        //cout << "here5" << endl;
 
     return Object; //This will never get called, but I need a return for it to compile
   }
@@ -844,10 +849,20 @@ Symbol assign_class::type_check()
 
 Symbol object_class::type_check()
 {
-  cout << "here in object class" << endl;
-  Symbol temp = *(objs.lookup(name));
+  //cout << "here in object class" << endl;
+  //cout << "My name is " << name << endl;
+  Symbol temp;
+  if(name == self){
+    //cout << "AOSJGAIDFJGA" << endl;
+    temp = (class_table->lookup(name)->get_name());
+  }
+  else
+  {
+    //cout << "AAAAA" << endl;
+    temp = *(objs.lookup(name));
+  }
   //I believe lookup will return a pointer to the Symbol. I want to return the value
-  cout << "magic happens" << endl;
+  ///class iscout << "magic happens with name "<<name << "   " <<temp << endl;
   set_type(temp);
   return temp;
 }
