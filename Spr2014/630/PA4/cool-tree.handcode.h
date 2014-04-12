@@ -178,7 +178,6 @@ void dump_with_types(ostream&,int);  \
  void scan(SymbolTable<Symbol, Symbol>* otable, \
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
-		otable->enterscope(); \
 		for (int i = formals->first(); formals->more(i); \
          i = formals->next(i)) \
       formals->nth(i)->scan(otable, ftable, ctable);\
@@ -186,7 +185,6 @@ void dump_with_types(ostream&,int);  \
     objs = *otable;	\
     functs = *ftable; \
     clazz = *ctable; \
-    otable->exitscope(); \
   }
   
   #define attr_EXTRAS \
@@ -197,8 +195,10 @@ void dump_with_types(ostream&,int);  \
    void scan(SymbolTable<Symbol, Symbol>* otable,\
             SymbolTable<Symbol, method_class>* ftable, \
             SymbolTable<Symbol, class__class>* ctable) { \
-    if (init) \
+    otable->addid(name, &type_decl); \
+    if (init){ \
       init->scan(otable, ftable, ctable); \
+    }\
     objs = *otable; \
     functs = *ftable; \
     clazz = *ctable; \

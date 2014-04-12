@@ -605,7 +605,7 @@ Symbol attr_class::type_check()
  
   Symbol e_type = init->type_check();
   Symbol decl_type =  *(objs.lookup(name));
-  //cout << "e_type is " << e_type << " and decl_type is " << decl_type << endl;
+  //cout <<"name is "<< name << " e_type is " << e_type << " and decl_type is " << decl_type << endl;
   //cout << name << endl;
   if(!test_subclass(e_type,decl_type) && e_type != No_type)
   {
@@ -640,14 +640,17 @@ Symbol dispatch_class::type_check()
 {
   //Get the method_class from the method table- this way comparisons can be done
   method_class * cur_method = method_table->lookup(name);
-  expr->get_type();
+  //cout << expr->get_type() << endl;
+  Symbol expr_type;
+  expr_type =  expr->type_check();
+  //cout <<"expr is: " <<  expr_type << endl;
   Symbol cur_expr_type;
   //cout << "name is " << name << endl;
   for(int i = actual->first(); actual->more(i); i = actual->next(i)){
     //Here, I want to check each of the dispach's expressions types
     cur_expr_type = actual->nth(i)->type_check();
     //cout << "confirm my suspicions " << name << endl;
-    if(cur_expr_type != cur_method->get_formals()->nth(i)->get_type()){
+    if(!test_subclass(cur_expr_type, cur_method->get_formals()->nth(i)->get_type())){
       classtable->semant_error(cur_expr_type,TYPE);
     }
   }
@@ -658,6 +661,8 @@ Symbol dispatch_class::type_check()
 
 Symbol static_dispatch_class::type_check()
 {
+  cout << "I am in a static dispatch" << endl;
+  method_class * cur_method = method_table->lookup(name);
   set_type(Object);
   return Object;
 }
