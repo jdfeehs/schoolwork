@@ -177,6 +177,16 @@ multimap as a child, it is added to our set. This means that if at any point,
 it is time to add the new child to the set, but that class type is already in
 our set, there must be a cycle.
 
+The other type of cycle (when it isn't caused by the same node being a child twice)
+was slightly harder to detect. In order to detect these, we traversed the inheritance
+graph from each child towards Object (the root of the graph.) If we reached Object
+in as many traversals as there are total nodes (or less), then there is not a cycle
+involving that child. However, if it was not possible to get to Object by traversing
+to each node's parent, that means there is a cycle. This was detected by counting
+how many parent calls were made, and comparing this to the total number of nodes.
+Once the parent call count was greater than the total number of nodes, we knew
+that there was definitely a cycle.
+
 --Type/Semantic checking--
 For type & semantic checking, first duplicates and illegal redefinitions are
 searched for in the ClassTable's constructor. For type checking and all other
@@ -194,10 +204,18 @@ then that node's type is set via a set_type method. If any errors were caught af
 type & semantic checking is complete, then the program exits after displaying:
 "Compilation halted due to static semantic errors."
 
+Type-checking was handled by a type_check method that belongs to each type of class.
+Each main class calls its tpye_check method, and this method calls all of its childrens'
+methods as well. This continues all the way down to the basic expressions, where the
+type of the expression can be determined, set on the AST, and returned back to its parent.
+This recursive style of methods allows calls to a feature's tpye_check method to not only
+evaluate to the proper value, but also evaluate all of its childrens' types and populate
+the AST.
 
 --What we did NOT complete--
 Our group did not implement lookups of self (when the self identifier is called as an object.)
-Thusly, we did not include the "self" object in any of our tests.
+Thusly, we did not include the "self" object in any of our good.cl tests.
+
 --Testing--
 For testing, we try most combinations of assignment and inheritance, self and normal
 dispatch, normal operations, from several different functions and classes that inherit.

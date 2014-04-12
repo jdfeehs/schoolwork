@@ -135,23 +135,17 @@ bool test_subclass(Symbol class_a, Symbol class_b)
 }
 
 ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) {
+        //Initialize the scopes for each table
 	class_table->enterscope();
         method_table->enterscope();
         build_inheritance_graph(classes);
-        //Symbol first = classes->nth(3)->get_name();
-        //Symbol second = classes->nth(4)->get_name();
-        //cout << "LCP of " << first << " and " << second << " is: " << least_common_parent(first,second) << endl;
-        //child = classes->nth(i)->get_name();
-        //parent = classes->nth(i)->get_parent();
-	//class_table=new SymbolTable<Symbol, class__class>();
 	install_basic_classes();
           
 	for(int i = classes->first(); classes->more(i); i = classes->next(i)) 
 	{
 		class__class *INSTANTIATEDclass=(class__class *)(classes->nth(i));
-		//insert into class map as well
 	
-		//This should test for any duplicates
+		//This tests for any duplicates
 		if (class_table->probe(INSTANTIATEDclass->get_name())!=NULL)
 			semant_error(INSTANTIATEDclass, DUPLICATE);
 
@@ -170,7 +164,10 @@ ClassTable::ClassTable(Classes classes) : semant_errors(0) , error_stream(cerr) 
 			semant_error(INSTANTIATEDclass, REDEFINITION);
 
 	}
+        //now that we have done some checking, traverse the tree twice
+        //This gathers information from the tree using each node's scan method
         collect_definitions(classes);
+        //This starts the type-checking process using each node's type_check method
         traverse_tree_for_checking(classes);
 
 }
@@ -186,18 +183,14 @@ Symbol least_common_parent(Symbol a, Symbol b)
   //Take care of the easy cases
   while(temp_A != Object){
     if(test_subclass(temp_A,temp_B)){
-        //cout << "Result 1" << endl;
 	return temp_B;}
     if(test_subclass(temp_B,temp_A)){
-        //cout << "Result 2" << endl;
 	return temp_A;}
     while(temp_B != Object){
       temp_B = map[temp_B];
       if(test_subclass(temp_A,temp_B)){
-        //cout << "Result 3" << endl;
 	return temp_B;}
       if(test_subclass(temp_B,temp_A)){
-        //cout << "Result 4" << endl;
 	return temp_A;}
     }
     temp_A = map[temp_A];
@@ -219,6 +212,7 @@ void ClassTable::build_inheritance_graph(Classes classes)
 {
     Symbol child;
     Symbol parent;
+    //Add the values of the default classes defined by COOL
     map.insert(std::pair<Symbol,Symbol>(IO,Object));
     map.insert(std::pair<Symbol,Symbol>(Int,Object));
     map.insert(std::pair<Symbol,Symbol>(Str,Object));
@@ -228,43 +222,30 @@ void ClassTable::build_inheritance_graph(Classes classes)
     children.insert(Str);
     children.insert(Bool);
     children.insert(Int);
-    int child_count = 5;
-    // This is a way to iterate through all of the classes in a Classes object
+    int child_count = 5; //It must start at 5 because of the ones added earlier
+ 
+    // Iterate through all of the classes in a Classes object
     for(int i = classes->first(); classes->more(i); i = classes->next(i))
     {
+        //Get the names of the node and its parent and store them in the map
         child = classes->nth(i)->get_name();
         child_count ++;
         parent = classes->nth(i)->get_parent();
-        //cout << child << " : " << parent << endl;
-	//For now, print out the child/parent pairs
-	//This is just so I can debug it
-	//cout << child << endl;
-	//cout << "----------" << endl;
         map[child] = parent;
-        //map.insert(std::pair<Symbol,Symbol>(child,parent));
-        //cout << map.at(child) << endl;
         if(children.count(child) == 0)
 	{
 	    children.insert(child);
 	}
 	else //it's a cycle!
 	{
-	    //i'm not sure how we're reporting errors yet.
-	    //for now, I'll do what's below
-	    //cout << "CYCLE!!!!!!!!!!!!" << endl;
-	    //Close, try this ;)
 	    this->semant_error(child,CYCLE);
 	}
     }
-    //This is my second way to check for cycles
+    //This is my second way to check for cycles- see README for more info
     int counter = 0;
     for(std::map<Symbol,Symbol>::iterator it = map.begin(); it!=map.end(); ++it)
     {
 	counter = 0;
-        //child = (it)->first;
-        //parent = (it)->second;
-        //dump_Symbol(cout,10,child); 
-        //cout << "child is: "<< child << endl;
 	while(parent != Object && counter <= child_count)
 	{
 	    child = parent;
@@ -273,19 +254,14 @@ void ClassTable::build_inheritance_graph(Classes classes)
 	}
 	if(counter >= child_count)
 	{
-	  //cout << "CYCLE!!!!1!!11!!!!" << endl;
 	  this->semant_error(child,CYCLE);
 	}
     }
-    //This code is supposed to make sure all parents are declared
+    //This code makes sure all parents are declared
     Symbol curChild;
     for(int j = classes->first(); classes->more(j); j=  classes->next(j))
     {
         curChild = classes->nth(j)->get_name();
-        //cout << "Here!" << endl;
-        //cout << curChild  << endl;
-        //cout << "Heeeeeeere" << endl;
-        //cout << map[curChild] << endl;
         if(children.count(map[curChild]) == 0 && map[curChild] != Object)
 	{
           Symbol badParent = map[curChild];
@@ -411,22 +387,13 @@ void ClassTable::install_basic_classes() {
 //This will collect all local definitions and put them in a node's table
 void ClassTable::collect_definitions(Classes classes)
 {
-	//method_table->enterscope();
+        //We have to be in a scope, now start the info-gathering process
 	object_table->enterscope();
-	//class__class *INSTANTIATEDclass = class_table->lookup(symbol);
 	
-	//INSTANTIATEDclass->scan(object_table,method_table,class_table);
 	for(int i = classes->first(); classes->more(i); i = classes->next(i))
 		classes->nth(i)->scan(object_table,method_table,class_table);
 	
-	//Now we can use a multimap to recurse through the tree. This
-	//is very similar to travelling for inheritance.
-	//std::multimap<Symbol, Symbol>::iterator it = range.first; 
-      // it != range.second; ++it)
-	
-	
 	object_table->exitscope();
-	//method_table->exitscope();
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -450,7 +417,6 @@ ostream& ClassTable::semant_error(Class_ c, code error_type)
     switch(error_type)
 	{
 		case REDEFINITION:
-			//Someone use sprintf to make these errors nicer
 			cout << "Redefinition of basic class." << endl;
 			break;
 		case CYCLE:
@@ -460,7 +426,6 @@ ostream& ClassTable::semant_error(Class_ c, code error_type)
 			cout << "There is a duplicate class." << endl;
 			break;
 		case INHERIT:
-			//With sprintf, we could say which classes! Do later. 
 			cout << "A class cannot inherit another class." << endl;
 			break;
 		case UNDECLARED:
@@ -478,7 +443,6 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
     switch(error_type)
 	{
 		case REDEFINITION:
-			//Someone use sprintf to make these errors nicer
 			cout << "Redefinition of basic class." << endl;
 			break;
 		case CYCLE:
@@ -488,7 +452,6 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
 			cout << "There is a duplicate class." << endl;
 			break;
 		case INHERIT:
-			//With sprintf, we could say which classes! Do later. 
 			cout << "A class cannot inherit another class." << endl;
 			break;
 		case UNDECLARED:
@@ -498,7 +461,7 @@ ostream& ClassTable::semant_error(Symbol s,code error_type)
 			cout << "Typechecking error for Symbol " << s  << endl;
 			break;
 	}                                                          
-    return semant_error(); //not sure how to get the class to send the line number
+    return semant_error(); 
 }    
 
 ostream& ClassTable::semant_error(Symbol filename, tree_node *t)
@@ -535,19 +498,8 @@ ostream& ClassTable::semant_error()
 void program_class::semant()
 {
     initialize_constants();
-    /* ClassTable constructor may do some semantic analysis */
-    //bool test = test_subclass(classes->nth(0)->get_name(),Object);
-    //cout << "My two classes were: " << classes->nth(0)->get_name() << " and " << classes->nth(1)->get_name() << endl;
-    //cout << "I sure hope that this is: " << test << endl;
-    //test = test_subclass(classes->nth(0)->get_name(),classes->nth(1)->get_name());
-    //cout << "But this should be :" << test << endl;
-    //ClassTable *classtable = new ClassTable(classes);
+    //Almost all of our work takes place in the ClassTable initialization
     classtable = new ClassTable(classes);
-    /* some semantic analysis code may go here */
-    /******************************************/
-    /*             Manal :)                   */
-    /*      Let the tree building begin       */
-    /******************************************/
 
     if (classtable->errors()) {
 	cerr << "Compilation halted due to static semantic errors." << endl;
@@ -563,64 +515,50 @@ void program_class::semant()
  *  those are currently called method_table and class_table
  */
 
+
+//This is the entry point for all type-checking
 void traverse_tree_for_checking(Classes classes)
 {
   for(int i = classes->first(); classes->more(i); i = classes->next(i))
   {
-        //cout << "here1" << endl;
-    //do something with the class?
     classes->nth(i)->type_check();
     
   }
 }
 
+//Simply call all of the class's features. A class is its own type
 Symbol class__class::type_check()
 {
-        //cout << "here2" << endl;
-   //cout << "class is " << name << endl;
    for(int i = features->first(); features->more(i); i = features->next(i))
      features->nth(i)->type_check();
 }
 
 
-
-
+//For a method, you only need to check its expression
 Symbol method_class::type_check()
 {
-   //Go through all of the lower parts of the tree
-   //for(int i = formals->first(); formals->more(i); i = formals->next(i))
-   //{
-   //  formals->nth(i)->type_check();
-   //}
-        //cout << "here3" << endl;
-
-   expr->type_check(); //make sure to type-check its expression
-   //This is nowhere near done, but needed to be defined
+   expr->type_check();
    return return_type;
 }
 
 Symbol attr_class::type_check()
 {
-        //cout << "hereinattr" << endl;
- 
+  //First, evaluate its init expression's type- this may be no_type 
   Symbol e_type = init->type_check();
   Symbol decl_type =  *(objs.lookup(name));
-  //cout <<"name is "<< name << " e_type is " << e_type << " and decl_type is " << decl_type << endl;
-  //cout << name << endl;
+  //Test for conformance, but make sure that there was actually an init expr
+  //If there was not an init expr, its type will be no_type
   if(!test_subclass(e_type,decl_type) && e_type != No_type)
   {
     //This is an error
     classtable->semant_error(decl_type,TYPE);
   }
-        //cout << "hereinattr" << endl;
   //We will get this far if there were no errors, so return the declared type
   return decl_type;
 }
 
-//The next few are definitely wrong. They need to return something so it compiles
 Symbol let_class::type_check()
 {
-  //if(init != no_expr
   //first, check the init expression
   Symbol init_type = init->type_check();
   if(init_type != No_type)
@@ -630,6 +568,7 @@ Symbol let_class::type_check()
       classtable->semant_error(init_type,TYPE);
     }
   }
+  //Now, go through the let body
   Symbol ret = body->type_check();
   
   set_type(ret);
@@ -640,16 +579,12 @@ Symbol dispatch_class::type_check()
 {
   //Get the method_class from the method table- this way comparisons can be done
   method_class * cur_method = method_table->lookup(name);
-  //cout << expr->get_type() << endl;
   Symbol expr_type;
   expr_type =  expr->type_check();
-  //cout <<"expr is: " <<  expr_type << endl;
   Symbol cur_expr_type;
-  //cout << "name is " << name << endl;
   for(int i = actual->first(); actual->more(i); i = actual->next(i)){
-    //Here, I want to check each of the dispach's expressions types
+    //Here, I want to check each of the dispach's expressions types for conformity
     cur_expr_type = actual->nth(i)->type_check();
-    //cout << "confirm my suspicions " << name << endl;
     if(!test_subclass(cur_expr_type, cur_method->get_formals()->nth(i)->get_type())){
       classtable->semant_error(cur_expr_type,TYPE);
     }
@@ -659,22 +594,20 @@ Symbol dispatch_class::type_check()
   return ret;
 }
 
+
+//This is almost identical to the regular dispatch code
 Symbol static_dispatch_class::type_check()
 {
-  //cout << "I am in a static dispatch" << endl;
   method_class * cur_method = method_table->lookup(name);
   Symbol expr_type;
   expr_type =  expr->type_check();
   if(!test_subclass(expr_type,type_name)){
     classtable->semant_error(expr_type,TYPE);
   }
-  //cout << type_name << endl;
   Symbol cur_expr_type;
-  //cout << "name is " << name << endl;
   for(int i = actual->first(); actual->more(i); i = actual->next(i)){
     //Here, I want to check each of the dispach's expressions types
     cur_expr_type = actual->nth(i)->type_check();
-    //cout << "confirm my suspicions " << name << endl;
     if(!test_subclass(cur_expr_type, cur_method->get_formals()->nth(i)->get_type())){
       classtable->semant_error(cur_expr_type,TYPE);
     }
@@ -683,8 +616,6 @@ Symbol static_dispatch_class::type_check()
   set_type(ret);
   return ret;
   
-   //set_type(Object);
-   //return Object;
 }
 
 //We don't need to implement this, but it has to be defined for my method to compile
@@ -727,7 +658,6 @@ Symbol plus_class::type_check()
   {
     classtable->semant_error(e2->type_check(),TYPE);  
   }
-  //cout << "IAMINPLUS" << endl;
   set_type(Int);
   return Int;
 }
@@ -849,7 +779,6 @@ Symbol loop_class::type_check()
 Symbol block_class::type_check()
 {
   Symbol temp;
-	//for(int i = body->first(); body->more(i); i = body->next(i)) 
   for(int i = body->first(); body->more(i); i = body->next(i))
   {
     temp = body->nth(i)->type_check();
@@ -861,47 +790,36 @@ Symbol block_class::type_check()
 
 Symbol assign_class::type_check()
 {
-        //cout << "here4" << endl;
-
-  //If it conforms properly
-  //cout << "name is " << name << " and expr type is " << expr->type_check() << endl;
+  //These symbol names correspond with the names in the COOL manual
   Symbol T_prime = expr->type_check();
-  //cout << "before object table "<< endl;
   Symbol T = *(objs.lookup(name));
-  //cout << "T is " << T << " and T_prime is: " << T_prime << endl;
+  //Test for conformity
   if(test_subclass(T_prime,T))
   {
-    //cout << "t_prime" << endl;
     set_type(T_prime);
     return T_prime;
   }
   else
   {
-    //Find a way to pass errors
     classtable->semant_error(name,TYPE);
     set_type(Object);
-        //cout << "here5" << endl;
-
     return Object; //This will never get called, but I need a return for it to compile
   }
 }
 
+
+//Look it up in the object table
+//This should check for self, but that part does not yet work correctly
 Symbol object_class::type_check()
 {
-  //cout << "here in object class" << endl;
-  //cout << "My name is " << name << endl;
   Symbol temp;
   if(name == self){
-    //cout << "AOSJGAIDFJGA" << endl;
     temp = (class_table->lookup(name)->get_name());
   }
   else
   {
-    //cout << "AAAAA" << endl;
     temp = *(objs.lookup(name));
   }
-  //I believe lookup will return a pointer to the Symbol. I want to return the value
-  ///class iscout << "magic happens with name "<<name << "   " <<temp << endl;
   set_type(temp);
   return temp;
 }
@@ -927,7 +845,7 @@ Symbol new__class::type_check()
 }
 
 
-//Deal with all of the basic expressions (leaes)
+//Deal with all of the basic expressions (leaves)
 
 Symbol int_const_class::type_check()
 {
