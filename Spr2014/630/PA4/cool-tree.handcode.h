@@ -56,15 +56,19 @@ virtual void semant() = 0;			\
 virtual void dump_with_types(ostream&, int) = 0;  \
 SymbolTable<Symbol, class__class> clazz; \
 
-
+//We want semant for errors
 #define program_EXTRAS                          \
 void semant();     				\
 void dump_with_types(ostream&, int);            
 
+//We define a type_check for each of the nodes
 #define branch_EXTRAS \
 Symbol type_check();\
 void dump_with_types(std::ostream&,int);
 
+//A class Phylum has no filename,parent,name,or features, however we define
+//the 3 symbol tables that will be used for each node: clazz for classes,
+//objs for objects, and functs for methods.
 #define Class__EXTRAS                   \
 virtual Symbol get_filename() = 0;      \
 virtual void dump_with_types(ostream&,int) = 0; \
@@ -79,6 +83,12 @@ SymbolTable<Symbol, method_class> functs; \
                     SymbolTable<Symbol, class__class>*) = 0; \
 virtual Symbol type_check() = 0;
 
+
+//For an actual constructor, we return the proper information.
+//To populate the tables, we go through the features adding them
+//to the method table (if they are methods) or object table
+//(otherwise). Then we scan each of the features themselves 
+//before saving the tables.
 #define class__EXTRAS                                 \
 Symbol get_name() { return name; }\
   Symbol get_filename() { return filename; }\
@@ -103,7 +113,8 @@ for(int i = features->first(); features->more(i); i = features->next(i)) {\
 }\
 void dump_with_types(std::ostream&, int);
 
-
+//Feature phylum. Like we classes define the tables and methods but set them
+//all to 0.
 #define Feature_EXTRAS                                        \
 virtual void dump_with_types(ostream&,int) = 0; 		\
 virtual void scan(SymbolTable<Symbol, Symbol>*, 			\
@@ -120,7 +131,7 @@ virtual Symbol type_check() = 0;
 #define Feature_SHARED_EXTRAS                                       \
 void dump_with_types(ostream&,int);    
 
-
+//Formal phylum. See comments for Classes & Features phylums.
 #define Formal_EXTRAS                              \
 virtual void dump_with_types(ostream&,int) = 0; \
  virtual void scan(SymbolTable<Symbol, Symbol>*, \
@@ -132,6 +143,7 @@ SymbolTable<Symbol, class__class> clazz; \
 Symbol type_check();\
 virtual Symbol get_type() = 0;
 
+//Actual formal constructor: define proper procedure.
 #define formal_EXTRAS                           \
 void dump_with_types(ostream&,int); 	\
 Symbol type_check();\
@@ -144,10 +156,11 @@ void scan(SymbolTable<Symbol, Symbol>* otable, \
     clazz = *ctable; \
   }\
 Symbol get_type() {return type_decl;}
+
 #define Case_EXTRAS                             \
 virtual void dump_with_types(ostream& ,int) = 0;
 
-
+// Expression phylum. See all other phylums.
 #define Expression_EXTRAS                    \
 Symbol type;                                 \
 Symbol get_type() { return type; }           \
@@ -167,7 +180,11 @@ virtual Symbol type_check() = 0;\
 #define Expression_SHARED_EXTRAS           \
 void dump_with_types(ostream&,int);  \
 
-
+//Actual method constructor. Define implementation.
+//Like we classes, we call scan through all parts
+//of the class (namely formals and the expression).
+//After ALL the scanning is complete we save the
+//tables.
  #define method_EXTRAS \
  Symbol get_name() { return name; }\
  Formals get_formals() { return formals; }\
@@ -187,6 +204,8 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+  //Implementation of attr constructor. If there is an initiation field then
+  //scan it, otherwise just save the tables.
   #define attr_EXTRAS \
   Symbol type_check();\
   Boolean is_method() { return false; }\
@@ -204,6 +223,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+  //Default scan behovior for assignment constructor.
   #define assign_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -215,6 +235,8 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+  //Scan actuals (real parts of static dispatch), followed by the expression,
+  //then save.
   #define static_dispatch_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -227,6 +249,8 @@ void dump_with_types(ostream&,int);  \
     functs = *ftable; \
     clazz = *ctable; \
   }
+  
+  // Dispatch constructor. Much like static dispatch... exactly the same.
   #define dispatch_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -240,6 +264,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
 
+  //Must have this for compilation (every node needs a scan).
   #define typcase_EXTRAS\
   Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -248,6 +273,7 @@ void dump_with_types(ostream&,int);  \
   int placeholder = 42;\
   }
   
+  //Must have this for compilation (every node needs a scan).
   #define no_expr_EXTRAS\
   Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -256,6 +282,8 @@ void dump_with_types(ostream&,int);  \
   int placeholder = 42;\
   }
   
+  /*Conditional constructor. Scan the predicate, followed by the then
+  clause and finally the else expression. As always, save the table last.*/
   #define cond_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -269,6 +297,7 @@ void dump_with_types(ostream&,int);  \
 	clazz = *ctable; \
   }
   
+  //Scan is always the same: call any other components to scan and then save table.
   #define loop_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -281,6 +310,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+  //Loop through elements of body (scanning them) and save tables.
   #define block_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -293,6 +323,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+  //Let requires an entire different scope. Otherwise scan components & save tables.
   #define let_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -308,6 +339,7 @@ void dump_with_types(ostream&,int);  \
     otable->exitscope(); \
   }
   
+  //Scan components, save tables.
   #define plus_EXTRAS \
   	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -320,6 +352,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define sub_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -332,6 +365,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define mul_EXTRAS \
   	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -344,6 +378,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define divide_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -356,6 +391,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define neg_EXTRAS \
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -367,6 +403,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define lt_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -379,6 +416,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
+    //Scan components, save tables.
   #define eq_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -391,6 +429,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define leq_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -403,6 +442,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
+    //Scan components, save tables.
   #define comp_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -414,6 +454,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define int_const_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -424,6 +465,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define bool_const_EXTRAS\
   	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable, \
@@ -434,6 +476,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable; \
   }
   
+    //Scan components, save tables.
   #define string_const_EXTRAS\
   	Symbol type_check();\
    void scan(SymbolTable<Symbol, Symbol>* otable,\
@@ -444,7 +487,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
-  
+    //Scan components, save tables.
   #define new__EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
@@ -455,6 +498,7 @@ void dump_with_types(ostream&,int);  \
     clazz = *ctable;\
   }
   
+    //Scan components, save tables.
   #define isvoid_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
@@ -468,6 +512,7 @@ void dump_with_types(ostream&,int);  \
   
   
   
+    //Save tables.
   #define object_EXTRAS\
   	Symbol type_check();\
   void scan(SymbolTable<Symbol, Symbol>* otable,\
