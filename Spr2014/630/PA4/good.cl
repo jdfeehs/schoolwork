@@ -1,9 +1,9 @@
 class C {
-	init(x : Int, y : Bool) : C {
+	init(x : Int, y : Bool) : Int {
            {
 		a <- x;
 		b <- y;
-		self;
+		3;
            }
 	};
 	a         : Int; (* Declare after use in the method up at top*)
@@ -13,13 +13,13 @@ class C {
 class B inherits C{
 	convertnum:        Int;
 	(* Same method as parent but different result for a and b *)
-	init(x : Int, y : Bool) : C {
+	init(x : Int, y : Bool) : Int {
     	{
     		while y loop{
     		a <- x + 2;
     		if y then b <- not y else b <- false fi;
 			}pool;
-			self;
+                42;			
         }
 	};
 	
@@ -36,10 +36,9 @@ class D inherits C{
 	object_example:    		Object <- new IO;
 	string_example_object:  Object <- string_example;
 	bool_example:			Bool <-true;
-	self_ret(): D {self};
-	init(x : Int, y : Bool) : C {
+	init(x : Int, y : Bool) : Int {
     	{
-			self;
+			42;
         }
 	};
 	result(input : Int): Int {
@@ -61,45 +60,32 @@ class D inherits C{
 	send_in_d_ret_bool_param(d_class_type : D, bool_example : Bool): Bool{
 		true
 	};
-	testing() : C {
+	testing() : Int {
 		{
-			d_type.self_ret();(*normal dispatch*)
-			self.self_ret();(*shorthand self dispatch*)
 
 			d_type.adding(num, num);(*normal dispatch*)
-			self.adding(num, num);(*shorthand self dispatch*)
 
 			d_type.ret_bool(string_example,bool_example);(*normal dispatch*)
-			self.ret_bool(string_example,bool_example);(*shorthand self dispatch*)
 
 			d_type.send_in_d_ret_int(d_type);(*normal dispatch*)
-			self.send_in_d_ret_int(d_type);(*shorthand self dispatch*)
 
-			d_type.send_in_d_ret_int(new F);(*Class F inherits D so calling d method passing in F as a subtype using normal dispatch*)
-			self.send_in_d_ret_int(new F);  (*Class F inherits D so calling d method passing in F as a subtype using shorthand self disptach*)
 
 			d_type.send_in_d_ret_bool_param(d_type, not bool_example);(*normal dispatch*)
-			self.send_in_d_ret_bool_param(d_type, not bool_example);(*shorthand self dispatch*)
 
 			d_type.init(num, bool_example);(*normal dispatch*)
-			self.init(num, bool_example);(*shorthand self dispatch*)
 
 			(new F).adding(num,num); (*Since F inherits D I tried to call F method which are D inherits since it inherits all of what D has *)
-			(new F).send_in_d_ret_int(new F); (*Since F inherits D I tried to call F method which are D inherits since it inherits all of what D has *)
 
 		    d_type@C.init(num, bool_example);(*Static dispatch, so that d_type must conform to the type speified C init method *)
 		    d_type@D.init(num, bool_example);(*Static dispatch, so that d_type must conform to the type speified D init method *)
 		  
-		    d_type@Object.type_name(); (*Static dispatch, so that d_type must conform to the type speified type_name method in the Object class which is a String Refernce maunal Object class section *)
 			d_type@D.adding(num,num); (*Static dispatch, so that d_type must conform to the type speified D adding method *)
 			
 			(new F)@D.init(num, bool_example);(*Static dispatch, so that new F type must conform to the type speified by D init method *)
 			(new C)@C.init(num, bool_example);(*Static dispatch, so that new C type  must conform to the type speified by C init metho *)
 			(new F)@F.init(num, bool_example);(*Static dispatch, so that new F type must conform to the type speified by F init method *)
 
-			(new C)@Object.type_name(); (*Static dispatch, so that C must conform to the type speified type_name method in the Object class which is a String Refernce maunal Object class section, since Objec is the root of inherantce, this statment is legal *)
-			(new F)@Object.type_name(); (*Static dispatch, so that F must conform to the type speified type_name method in the Object class which is a String Refernce maunal Object class section,  since Objec is the root of inherantce, this statment is legal  *)
-			self;
+			42;
 		}
 	};
 	(* Testing out basic valid statement in COOL *)
@@ -119,7 +105,7 @@ class D inherits C{
 };
 class F inherits D {};
 Class Main {
-	main():C {
+	main():Object {
 	  (new C).init(1,true)
 	};
 };

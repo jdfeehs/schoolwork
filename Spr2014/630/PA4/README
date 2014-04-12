@@ -194,6 +194,10 @@ then that node's type is set via a set_type method. If any errors were caught af
 type & semantic checking is complete, then the program exits after displaying:
 "Compilation halted due to static semantic errors."
 
+
+--What we did NOT complete--
+Our group did not implement lookups of self (when the self identifier is called as an object.)
+Thusly, we did not include the "self" object in any of our tests.
 --Testing--
 For testing, we try most combinations of assignment and inheritance, self and normal
 dispatch, normal operations, from several different functions and classes that inherit.

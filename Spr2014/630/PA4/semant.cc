@@ -661,10 +661,30 @@ Symbol dispatch_class::type_check()
 
 Symbol static_dispatch_class::type_check()
 {
-  cout << "I am in a static dispatch" << endl;
+  //cout << "I am in a static dispatch" << endl;
   method_class * cur_method = method_table->lookup(name);
-  set_type(Object);
-  return Object;
+  Symbol expr_type;
+  expr_type =  expr->type_check();
+  if(!test_subclass(expr_type,type_name)){
+    classtable->semant_error(expr_type,TYPE);
+  }
+  //cout << type_name << endl;
+  Symbol cur_expr_type;
+  //cout << "name is " << name << endl;
+  for(int i = actual->first(); actual->more(i); i = actual->next(i)){
+    //Here, I want to check each of the dispach's expressions types
+    cur_expr_type = actual->nth(i)->type_check();
+    //cout << "confirm my suspicions " << name << endl;
+    if(!test_subclass(cur_expr_type, cur_method->get_formals()->nth(i)->get_type())){
+      classtable->semant_error(cur_expr_type,TYPE);
+    }
+  }
+  Symbol ret = cur_method->get_return();
+  set_type(ret);
+  return ret;
+  
+   //set_type(Object);
+   //return Object;
 }
 
 //We don't need to implement this, but it has to be defined for my method to compile
