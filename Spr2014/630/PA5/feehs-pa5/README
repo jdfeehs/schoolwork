@@ -1,0 +1,252 @@
+README file for Programming Assignment 5  (C++ edition)
+=======================================================
+
+Your directory should now contain the following files:
+
+ Makefile	      -> [course dir]/assignments/PA5/Makefile
+ README
+ ast-lex.cc	      -> [course dir]/src/PA5/ast-lex.cc
+ ast-parse.cc	      -> [course dir]/src/PA5/ast-parse.cc
+ cgen-phase.cc	      -> [course dir]/src/PA5/cgen-phase.cc
+ cgen.cc
+ cgen.h
+ cgen_supp.cc
+ cool-tree.cc	      -> [course dir]/src/PA5/cool-tree.cc
+ cool-tree.handcode.h
+ dumptype.cc	      -> [course dir]/src/PA5/dumptype.cc
+ emit.h
+ example.cl
+ handle_flags.cc      -> [course dir]/src/PA5/handle_flags.cc
+ mycoolc	      -> [course dir]/src/PA5/mycoolc*
+ stringtab.cc	      -> [course dir]/src/PA5/stringtab.cc
+ tree.cc	      -> [course dir]/src/PA5/tree.cc
+ utilities.cc	      -> [course dir]/src/PA5/utilities.cc
+ *.d
+
+The include (.h) files for this assignment can be found in 
+[course dir]/include/PA5
+
+	The Makefile contains targets for compiling and running your
+	program, as well as handing it in. DO NOT MODIFY.
+
+	The README contains this info. Part of the assignment is to
+	fill the README with the write-up for your project. You should
+	explain design decisions, explain why your code is correct,
+	and why your test cases are adequate. It is part of the
+	assignment to clearly and concisely explain things in text as
+	well as to comment your code. Just edit this file.
+
+	In example.cl you should write a correct Cool program which
+	tests as many aspects of the code generator as possible. It
+	should pass your code generator, and running spim on the
+	generated output should run the program correctly.
+
+	cgen.cc is the skeleton file for the code generator. This
+	skeleton is much larger than the ones for previous
+	assignments.  The skeleton provides three components of the
+	code generator:
+
+		- functions to build the inheritance graph; (we supply
+		  this in case you didn't get this working for PA4)
+
+		- functions to emit global data and constants;
+		 
+		- functions to emit spim instructions; (we supply
+		  these last two to save you some tedious coding)
+
+	You should work to understand this code, and it will help you
+        write the rest of the code generator.
+
+	cgen.h is the header file for the code generator. Feel free to
+	add anything you need.
+
+	cgen_supp.cc is general support code for the code generator.
+	You can add functions as you see fit, but do not modify the 3
+	functions:
+
+		o byte_mode
+		o ascii_mode
+		o emit_string_constant
+
+	emit.h defines a bunch of macros which should come in handy
+	when you actually want to emit code. Feel free to change
+	anything here to suit your needs.
+
+        cgen-phase.cc supplies the driver for the compiler. You should
+        not modify this code.  The script mycoolc can pass any of the
+        standard flags to the code generator; for this assignment, -c
+        (code generator debug) may be useful as it sets a global
+        variable cgen_debug to true (1).  If you want your code
+        generator to print debug information when the option is set,
+        write your debug code in the following format:
+
+	      if (cgen_debug)
+	      {
+		...
+	      }
+
+	symtab.h contains a symbol table implementation. You may
+        modify this file if you'd like.  To do so, remove the link and
+        copy `[course dir]/include/PA5/symtab.h' to your local
+        directory.
+
+	cool.h contains definitions that are used by almost all parts
+	of the compiler. DO NOT MODIFY.
+
+        tree.h contains the base class `tree_node' of the AST nodes.
+
+        cool-tree.cc, cool-tree.h, and cool-tree.handcode.h contain
+        the declarations and definitions of code generation AST nodes.
+        You may add fields as you wish, but you shouldn't modify any
+        of the methods already there except `code', which you may
+        modify or remove as you wish.  Note that cool-tree.handcode.h
+        is different from the same file in PA4---this file contains
+        function definitions needed for the cgen.cc skeleton.  You may
+        modify cool-tree.handcode.h, but don't modify cool-tree.cc.
+        Place all method definitions in cgen.cc
+
+	stringtab.h contains functions to manipulate the string table.
+	DO NOT MODIFY.
+
+	dumptype.cc contains functions for printing out an abstract
+	syntax tree.  DO NOT MODIFY.
+
+        *.d dependency files, generated automatically by the makefile.
+
+Instructions
+------------
+
+	To compile your compiler and code generator type:
+
+	% make cgen
+
+	To test your compiler, type:
+
+	% ./mycoolc [-o output filename] <file1.cl> <file2.cl> ...
+
+	This command parses all the cool files given on the command
+	line, passes them through the semantic checker, and then hands
+	the program AST to your code generator.
+
+	To run your compiler on the file example.cl, type:
+
+	% make dotest
+
+	To run the produced code:
+
+	% spim -file file1.s  /* or the output filename you chose */
+	
+	To turnin your work type:
+
+	% make submit
+
+	And turn in the zip file through Canvas.
+	
+	GOOD LUCK!
+
+---8<------8<------8<------8<---cut here---8<------8<------8<------8<---
+
+Write-up for PA5
+----------------
+
+In an effort to make this the best README, I have split it into different sections.
+The first section will describe what functionality of the code generation that I
+have completed, and I will then describe each of those functions: what they do,
+how I implemented them, and why I made the design decisions that I made.
+
+I am going to note up-front: this PA is not complete. Due to me getting sick for
+about a week (and thus a week behind on coding) and finals coming up, I was unable
+to finish the methods that actually emit all of the code. All of the infrastructure
+should be in place that would allow me to emit code, but I did not complete that, and
+wanted to still turn in something that compiles and emits some meaningful code.
+I just wanted to be straight with you about what is and isn't done, and why. I'm really
+sorry that I wasn't able to complete this.
+Anyhow, below is the meat of the README.
+
+---What Currently Works---
+My cgen.cc outputs all of the data section (class nametable, object table, dispatch table,
+and prototype objects) as well as code that does the init methods and method bodies.
+I have only completed the simple ::code() methods, so the init and method bodies are only correct
+if they only require simple initializations. This means that things like B : Int <- 10; work,
+whereas something like the program we found in class that did everything in its init attribute
+will not work. The same goes for methods and method bodies. My example.cl reflects this, as it
+only uses those simple expressions.
+
+--Class Nametable--
+In order to collect information for the class nametable and eventually code the
+table, I made multiple changes to cgen.cc.
+In order to store the needed information (the index of an object's string), I created
+an std::map<std::string,map> what would be global in all of cgen.cc. I decided to make
+this map global instead of adding it to the CgenClassTable because of where I wanted to
+call it. In order to populate this map, I added a few lines of code to the
+StringEntry::code_ref function, as this function is called once for each StringEntry.
+Because the map is global, each StringEntry that called code_ref() would have access
+to the map, and could store its string (using get_string()) and its index (called "index")
+into the map.
+In order to code the name table, I created a method in the CgenClassTable called
+code_classtab(). This method iterates through the CgenClassTable's list of CgenNodes,
+uses each node's name as a lookup into the map, and prints out the correct value. I
+decided to use the list of CgenNodes because the CgenNode list is in part, a list of the
+classes that are in the program, so I would make sure to only print values from the map
+that refer to classes, not to other strings.
+
+--Object Table--
+At this point, I had already gathered all of the information needed to make the object table.
+In order to do code the object table, I needed to go through and sort the class names by their classtag,
+and then print them in order. Fortunately, I had already assigned classtags to each class,
+so all I needed to do was iterate through the classes, put them in the correct place in
+an array, and output the table.
+
+--Dispatch Tables--
+I decided to store an std::map<std::string,int> in each CgenNode called dispatch_info
+that would map the name of the method to its relative offset within the dispatch table.
+I also added an int to the CgenNode called method_count that would assist in coding the tables.
+The code that gathers all of the info into the dispatch tables starts in CgenNode::collect_dispatch_tables().
+This method simply goes through each CgenNode and calls its populate_dispatch_table() method.
+The populate_dispatch_table method is the one that actually does most of the work.
+It recursively calls its parent's populate_dispatch_table method first, so it knows how
+many methods its parent's dispatch table has, and can have its parents table at the beginning
+of its table. From there, it populates its own table and sets its method_count value.
+
+The dispatch tables are coded within the code_dispatch_tables() method. This method, like
+the others mentioned, iterates through each of the CgenNodes and emits its dispatch table.
+I decided to use a temporary array in this method to store the current object's method names
+in order, because the map that is storing them in the backend does not store them in the
+order that I want them to be printed in. In order to print them all in order, I first
+place them in the array according to their offset (which is in the map) and then
+go through the array and emit the dispatch table.
+
+--Prototype Objects--
+In order to store the information I would need for prototype objects, as well as dispatches and
+init methods, I created two methods:  CgenClassTable::collect_proto_object(), the outside function,
+which would then call CgenNode::populate_prototype_info(). The CgenNode method is where all of the
+work is actually done.
+I wanted to store information about each of the attributes at this point. In order to do this, I
+created three std::maps. All three map the std::string that represents the name of an attribute
+to the value I wanted associated with it. The first maps the name to an integer, which would be the
+index within the prototype object that I assigned it. The second map maps the name to the Symbol
+representing the type of the attribute. This would allow me to get the correct default value when
+making a prototype object. The third map maps the string to the attribute's initialization expression.
+This would make it easier to handle within the init method creation.
+Because each CgenNode has its own map, this is all of the information I needed to create the map.
+Emitting the prototype objects was as simple as iterating through the CgenNode List and referring to
+each node's maps to get the necessary information
+
+--Infrastructure for the rest of the code--
+From here, the remaining work was to emit the code for all of the methods, including the init method
+for each class. As noted above, I did not finish the code that actually emits all of the MIPS, but I
+was able to finish the code that would call the ::code methods.
+I split this work into two sections: code_init_methods() and code_methods().
+
+The first method goes through each CgenNode, emits the proper label and header, and then calls the
+code method ofeach attribute that the class has. If the class does not have an initialization, the
+code method that is called will be the no_expr code, which does nothing, so this should be ok.
+I assumed from here that the return value would be stored in $a0 (and that's what I did in the ::code
+methods that are done). Because of this, after the expr-code() method is called, I use my attribute
+index map to find the offset into the object (a pointer to which is in $s0), and then store the value
+from $a0 into the proper place within the object.
+
+In emitting the code for the other general methods, I go through each of the CgenNodes and its features,
+checking to see if they are methods or not. If they are methods, I print their label and call their
+expression's code method.
+

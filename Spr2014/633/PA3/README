@@ -1,0 +1,20 @@
+README for other files (not my report)
+By: Josh Feehs
+
+1) ps.py is my ps script. It can be run using: python ps.py name_of_memory_file
+
+2) lsof.py is my lsof script. It can be run using: python lsof.py name_of_memory_file pid_no
+
+3) gen_lsof.sh is a script that generates lsof.txt. This should not need to be run, but in
+   the event that you want to, it is simply ./gen_lsof.sh
+
+4) lsof.txt is the output of my lsof program for all of the processes that appeared in
+   my ps output. The header of each table is printed for each pid number, so for processes
+   that do not have any open files, the only thing it will print is:
+Process Name    PID     FD      Mode    Type    Device No   Size    Inode Number    File Name                       
+----------------------------------------------------------------------------------------------------------------------
+
+
+
+   That is to be expected, as lsof was designed to be run on one process at a time. PID values will
+   only be printed for processes that have open files.
