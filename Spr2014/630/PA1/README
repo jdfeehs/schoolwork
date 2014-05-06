@@ -1,0 +1,62 @@
+
+README file for Programming Assignment 1
+========================================
+
+Your directory should now contain the following files:
+
+ Makefile -> [course dir]/assignments/PA1/Makefile
+ README
+ atoi.cl -> [course dir]/assignments/PA1/atoi.cl
+ stack.cl
+ stack.test -> [course dir]/assignments/PA1/stack.test
+
+	The Makefile contains targets for compiling and running your
+	program.
+
+	The README contains this info. Part of the assignment is to
+	answer the questions at the end of this README file.
+	Just edit this file.
+
+	atoi.cl is an implementation in Cool of the string to integer
+	conversion function known from the C language.
+
+	stack.cl is the skeleton file which you should fill in with
+	your program.
+
+	stack.test is a short test input to the stack machine. It is
+	run through your program when you hand it in, and the output
+	is also	handed in.
+
+Instructions
+------------
+
+	To compile and run your program, type:
+
+	% make test
+
+        Try it now -- it should work, and print "Nothing implemented"
+        (among a few other things).
+
+
+        To simply compile your program, type
+
+        % make compile
+
+
+	Instructions for turning in the assignment will be posted on the
+	course web page.
+
+	GOOD LUCK!
+
+
+Questions on PA1
+----------------
+
+1. Describe your implementation of the stack machine in a single short
+   paragraph.
+
+I decided to take advantage of list.cl and the List and Cons data structures that were already created to represent my back-end stack. I created a stack class that stored data in a modified List that operates on strings instead of integers.
+
+ I created the basic push/pop methods for the stack, as well as a get_top method so the main program could identify what was on the top of the stack. The main program identifies what command was input and then dispatches to helper methods that handle each specific case.
+
+Because list.cl was a clear example of how to implement a list (which worked well for my underlying stack structure), I modified it to work on strings and created other methods to modify the high-level stack. Most methods were short, as this segmentation made it easier to see what code was being called and what each method call accomplished.
